@@ -1,13 +1,13 @@
 #'@name moRphomenses
-#'
+#'@docType package
 #'
 #'@title Geometric Morphometric Analysis of Hormone Cycle Phenotypes
 #'@author Daniel E. Ehrlich
 #'
-#'@description Helper functions for visualizing and screening 2D/3D landmark data.
+#'@description Analyze shapes/phenotypes of hormone data using Geometric Morphometric inspired methods.
 #'
 #'@import rgl
-#'@import shiny
+#'
 #'
 #'
 #'

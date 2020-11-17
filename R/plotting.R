@@ -2,7 +2,7 @@
 #'
 #' Plot Raw (alinged) data along side by side with imputed data.
 #'
-#' @param A1 An aligned array, containng missing data (presumably made with \code{\link{mm_MakeArray}})
+#' @param A1 An aligned array, containng missing data (presumably made with \code{\link{mm_ArrayData}})
 #' @param A2 An aligned and imputed array (presumbably made with \code{\link{mm_FillMissing}})
 #' @param ObO One-by-One. If TRUE (default), individuals will be plotted one at a time, requiring the user to advance/exit the operation. If FALSE, all plots will be generated at once to be browsed/exported from  the Plot History
 #'
@@ -174,7 +174,7 @@ mm_SilPlot <- function(x, maxC=15, ...) {
 #' @export
 
 mm_Phenotype <- function(A, k = NULL, maxPC = 10){
-  require(dendextend)
+
   n <- dim(A)[[3]]
   lbl <- character(n)
   if(is.null(dimnames(A)[[3]])){
@@ -216,8 +216,9 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
   grpShapes <- list()
   for(i in 1:length(k)){
     grpID[[i]] <- data.frame(
-      paste("g",k[i],"id", sep="") = stats::cutree(hcl,k = k[i]),
-      paste("g",k[i],"col", sep="") = character())
+      "grpID" = stats::cutree(hcl,k = k[i]),
+      "grpCol" = character()
+      )
 
     grpShapes[[i]] <- names(grpID[[i]]) <- paste("g",k[i], sep="")
 

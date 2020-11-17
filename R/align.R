@@ -1,4 +1,5 @@
 #' Array Data
+#' @aliases mm_ArrayData
 #'
 #' Construct a ragged array (containing missing data) of a specified length (up/down sampling individuals to fit).
 #'
@@ -9,14 +10,14 @@
 #' @param ObsMid A vector containng the midpoint day for each individual. Note: ObsMid must have the same number of observations as unique Individuals.
 #' @param StartDay Default is starting at ObsDay 1, can specify other values to subsample.
 #' @param EndDay If NULL (default), the highest ObsDay is used for each individual.
-#' @param ScaleTo Integer. Number of days to up/down sample observations to using \code{\link{mm_GetIntervals}}.
+#' @param ScaleTo Integer. Number of days to up/down sample observations to using \code{\link{mm_GetInterval}}.
 #' @param ScaleToMid If NULL (default) 0 will be centered using mm_interval.
 #'
-#' @return Returns a 3D array of data to be analyzed. Data array is in the form [ObsDays , ObsValue , ObsID]
+#' @return Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
 #'  @export
 #'
 #'
-mm_ArrayDat <- function(ObsIDs, ObsDays, ObsValue, ObsMid, StartDay = 1, EndDay = NULL, ScaleTo, ScaleToMid = NULL){
+mm_ArrayData <- function(ObsIDs, ObsDays, ObsValue, ObsMid, StartDay = 1, EndDay = NULL, ScaleTo, ScaleToMid = NULL){
   ObsIDs <- as.factor(ObsIDs)
   IDlevs <- levels(ObsIDs)
   if(length(ObsMid) != length(IDlevs)){
@@ -84,7 +85,8 @@ mm_ArrayDat <- function(ObsIDs, ObsDays, ObsValue, ObsMid, StartDay = 1, EndDay 
 #'
 #' @return Returns a scaled vector
 #'
-#' @example mm_MinMaxScale(1:10)
+#' @examples
+#' mm_MinMaxScale(1:10)
 #' @export
 #'
 
@@ -98,7 +100,8 @@ mm_MinMaxScale <- function(x){
 #'
 #' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
 #'
-#' @example mm_GeomScale(1:10)
+#' @examples
+#' mm_GeomScale(1:10)
 #' @export
 #'
 #
@@ -106,7 +109,11 @@ mm_GeomScale <- function(x){
   return(x/(prod(x)^(1/length(x))))
 }
 
+
+
+
 #' Impute Missing Data
+#' @aliases mm_FillMissing
 #'
 #' Fill in a ragged away by nearest neighbor imputation
 #'
@@ -170,6 +177,7 @@ mm_FillMissing <- function(A, knn = 3, scale = c("none", "MinMax", "Geom")){
 
 
 #' Create equallly spaced intervals.
+#' @aliases mm_GetInterval
 #'
 #' Create a sequence from -1:1 of specified length. Midpoint (day0) can be
 #'

@@ -1,20 +1,22 @@
-#' Construct a ragged array (containing missing data) of a specified length
+#' Array Data
+#'
+#' Construct a ragged array (containing missing data) of a specified length (up/down sampling individuals to fit).
 #'
 #'
-#' @param ObsIDs A vector that contains indiviaul IDs repeated for muliple days of collection
+#' @param ObsIDs A vector that contains indiviaul IDs repeated for muliple days of collection.
 #' @param ObsDays A vector that contains information on time, IE Day 1, Day 2, Day 3. Note: this vector should include integers, continuous data might produce unintended results.
 #' @param ObsValue A vector containing the variable sampled.
 #' @param ObsMid A vector containng the midpoint day for each individual. Note: ObsMid must have the same number of observations as unique Individuals.
-#' @param startDay Default is starting at ObsDay 1, can specify other values to subsample.
-#' @param endDay If NULL (default), the highest ObsDay is used for each individual.
-#' @param scaleTo Integer. Number of days to up/down sample observations to using mm_interval.
-#' @param scaleToMid If NULL (default) 0 will be centered using mm_interval.
+#' @param StartDay Default is starting at ObsDay 1, can specify other values to subsample.
+#' @param EndDay If NULL (default), the highest ObsDay is used for each individual.
+#' @param ScaleTo Integer. Number of days to up/down sample observations to using \code{\link{mm_GetIntervals}}.
+#' @param ScaleToMid If NULL (default) 0 will be centered using mm_interval.
 #'
-#' @return Returns a 3D array of data to be analyzed. Data array is in the form [StudyDay , Value , Indivual]
+#' @return Returns a 3D array of data to be analyzed. Data array is in the form [ObsDays , ObsValue , ObsID]
 #'  @export
 #'
 #'
-mm_arrayDat <- function(ObsIDs, ObsDays, ObsValue, ObsMid, startDay = 1, endDay = NULL, scaleTo, scaleToMid = NULL){
+mm_ArrayDat <- function(ObsIDs, ObsDays, ObsValue, ObsMid, StartDay = 1, EndDay = NULL, ScaleTo, ScaleToMid = NULL){
   ObsIDs <- as.factor(ObsIDs)
   IDlevs <- levels(ObsIDs)
   if(length(ObsMid) != length(IDlevs)){
@@ -26,8 +28,9 @@ mm_arrayDat <- function(ObsIDs, ObsDays, ObsValue, ObsMid, startDay = 1, endDay 
     stop("length of observations not equal")
   }
 
-  aDat <- array(dim = c(scaleTo, 2, length(IDlevs)))
-  mshpx <- mm_intervals(days = scaleTo, day0 = scaleToMid)
+  aDat <- array(dim = c(ScaleTo, 2, length(IDlevs)))
+  dimnames(aDat)[[3]] <- IDlevs
+  mshpx <- mm_GetInterval(days = ScaleTo, day0 = ScaleToMid)
 
   dat1 <- cbind(ObsIDs, ObsDays, ObsValue)
 
@@ -35,12 +38,12 @@ mm_arrayDat <- function(ObsIDs, ObsDays, ObsValue, ObsMid, startDay = 1, endDay 
 
     ## ID, ObsDay, ObsVal
     ss <- dat1[ObsIDs==IDlevs[i],]
-    if (is.null(endDay)){
+    if (is.null(EndDay)){
       maxi <- max(ss[,2], na.rm = T) ## max day
     } else {
-      maxi <- endDay
+      maxi <- EndDay
     }
-    seq1 <- startDay:maxi
+    seq1 <- StartDay:maxi
     anchi <- ObsMid[i]
 
     mati <- cbind(seq1, rep(NA, length(seq1)))
@@ -62,8 +65,8 @@ mm_arrayDat <- function(ObsIDs, ObsDays, ObsValue, ObsMid, startDay = 1, endDay 
 
     mat2 <- rbind(lh, cent, uh)
 
-    fill <- matrix(nrow = scaleTo, ncol = 2)
-    for (j in 1:scaleTo){
+    fill <- matrix(nrow = ScaleTo, ncol = 2)
+    for (j in 1:ScaleTo){
       val <- which.min(abs(mat2[,1] - mshpx[j]))
       fill[j,1] <- mshpx[j]
       fill[j,2] <- mat2[val,2]
@@ -73,38 +76,52 @@ mm_arrayDat <- function(ObsIDs, ObsDays, ObsValue, ObsMid, startDay = 1, endDay 
   return(aDat)
 }
 
-#' scale a vector from 0,1
+#' Min-Max Scaling
 #'
+#' Scale a vector from 0,1 based on its minimum and maximum values.
 #'
+#' @param x A Numeric vector to be scaled. Missing values are allowed and ignored.
 #'
+#' @return Returns a scaled vector
 #'
+#' @example mm_MinMaxScale(1:10)
+#' @export
 #'
 
 mm_MinMaxScale <- function(x){
   return((x- min(x, na.rm = T)) /(max(x, na.rm = T)-min(x, na.rm = T)))
 }
 
-#' Scale a vector by its geometric mean
+#' Geometric Scaling
 #'
+#' Calculate the geometric mean of a vector and scale all values by it.
 #'
+#' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
+#'
+#' @example mm_GeomScale(1:10)
+#' @export
 #'
 #
 mm_GeomScale <- function(x){
   return(x/(prod(x)^(1/length(x))))
 }
 
+#' Impute Missing Data
+#'
 #' Fill in a ragged away by nearest neighbor imputation
 #'
+#' @param A A ragged array, presumably constructed with \code{\link{mm_ArrayData}}.
+#' @param knn Number of nearest neighbors to draw on for imputation (default = 3).
+#' @param scale Type of scaling to implement (or not). Must be one of "none", "MinMax", "Geom"
 #'
-#'
-#'
+#' @export
 #'
 
-mm_fillMissing <- function(A, nn = 3, scale = c("none", "MinMax", "Geom")){
+mm_FillMissing <- function(A, knn = 3, scale = c("none", "MinMax", "Geom")){
 
   n <- dim(A)[[3]]
   if (is.null(dimnames(A)[[3]])){
-    dimnames(A) <- paste("Spec",1:n, sep = "")
+    dimnames(A)[[3]] <- paste("Spec",1:n, sep = "")
   }
 
   missing <- apply(A, 3, anyNA)
@@ -122,7 +139,7 @@ mm_fillMissing <- function(A, nn = 3, scale = c("none", "MinMax", "Geom")){
       for (j in 1:dim(all)[[3]]){
         rank[j] <- sum((tar-all[,,j])^2)
       }
-      ch <- names(rank[order(rank)])[1:nn] ## chose nunmber of neighbors
+      ch <- names(rank[order(rank)])[1:knn] ## chose nunmber of neighbors
       rep <- apply(A[,,ch], c(1,2), mean) ## calculate the replacement values
       intA[ps,,i] <- rep[ps,] ## replace only the missing values
     }
@@ -152,14 +169,22 @@ mm_fillMissing <- function(A, nn = 3, scale = c("none", "MinMax", "Geom")){
 }
 
 
-#' Create a sequence from -1:1 of specified length
+#' Create equallly spaced intervals.
+#'
+#' Create a sequence from -1:1 of specified length. Midpoint (day0) can be
 #'
 #' @param days The number of days(divisions) fit between -1 and 1 (inclusive)
-#' @param day0 If NULL (default), the median integer will be calculated. This produces (nearly) symmetrical ranges. Can be specified for asymmetric ranges.
+#' @param day0 If NULL (default), the median integer will be calculated. This produces symmetrical ranges when days = odd number. Can be specified for asymmetric ranges.
 #'
-#'@export
+#' @examples
+#' mm_GetInterval(15) ## Symmetrical sequence from -1 to 1 with 0 in the middle.
+#' mm_GetInterval(15, day0 = 8) ## The same sequence, explicitly specifying the midpoint
 #'
-mm_intervals <- function(days, day0 = NULL){
+#' mm_GetInterval(15, day0 = 3) ## 15 divisions with an asymmetric distribution.
+#'
+#' @export
+#'
+mm_GetInterval <- function(days, day0 = NULL){
   seq1 <- 1:days
   if (is.null(day0)){
     mid <- as.integer(median(seq1))

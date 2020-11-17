@@ -73,6 +73,83 @@ mm_arrayDat <- function(ObsIDs, ObsDays, ObsValue, ObsMid, startDay = 1, endDay 
   return(aDat)
 }
 
+#' scale a vector from 0,1
+#'
+#'
+#'
+#'
+#'
+
+mm_MinMaxScale <- function(x){
+  return((x- min(x, na.rm = T)) /(max(x, na.rm = T)-min(x, na.rm = T)))
+}
+
+#' Scale a vector by its geometric mean
+#'
+#'
+#'
+#
+mm_GeomScale <- function(x){
+  return(x/(prod(x)^(1/length(x))))
+}
+
+#' Fill in a ragged away by nearest neighbor imputation
+#'
+#'
+#'
+#'
+#'
+
+mm_fillMissing <- function(A, nn = 3, scale = c("none", "MinMax", "Geom")){
+
+  n <- dim(A)[[3]]
+  if (is.null(dimnames(A)[[3]])){
+    dimnames(A) <- paste("Spec",1:n, sep = "")
+  }
+
+  missing <- apply(A, 3, anyNA)
+  intA <- A
+
+  for (i in 1:n){
+    if(anyNA(A[,,i])){
+      ps <- is.na(A[,2,i]) ## identify points for interpolation
+      tar <- A[!ps,,i] ## target individual
+
+      all <- A[!ps,,!missing] ##all individuals
+
+      rank <- numeric(dim(all)[[3]])
+      names(rank) <- dimnames(all)[[3]]
+      for (j in 1:dim(all)[[3]]){
+        rank[j] <- sum((tar-all[,,j])^2)
+      }
+      ch <- names(rank[order(rank)])[1:nn] ## chose nunmber of neighbors
+      rep <- apply(A[,,ch], c(1,2), mean) ## calculate the replacement values
+      intA[ps,,i] <- rep[ps,] ## replace only the missing values
+    }
+  }
+
+
+  if(scale == "MinMax"){
+    for (i in 1:n){
+      intA[,2,i] <- mm_MinMaxScale(intA[,2,i])
+    }
+  } else if(scale == "Geom"){
+    for (i in 1:n){
+      intA[,2,i] <- mm_GeomScale(intA[,2,i])
+    }
+  }
+
+  mshp <- apply(intA, c(1,2), mean)
+  outliers <- data.frame("ID" = dimnames(intA)[[3]], "nmis" = numeric(n), "error" = numeric(n))
+
+  for (i in 1:n){
+    outliers$nmis[[i]] <- sum(is.na(A[,2,i]))
+    outliers$error[[i]] <- sum((intA[,2,i] - mshp[,2])^2)
+  }
+  out <- list("dat" = intA, "info" = outliers, "grandM" = mshp,  "scaleType" = scale)
+
+  return(out)
+}
 
 
 #' Create a sequence from -1:1 of specified length

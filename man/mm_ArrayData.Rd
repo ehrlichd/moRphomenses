@@ -34,7 +34,6 @@ mm_ArrayData(
 }
 \value{
 Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
-@export
 }
 \description{
 Construct a ragged array (containing missing data) of a specified length (up/down sampling individuals to fit).

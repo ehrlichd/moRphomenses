@@ -16,7 +16,6 @@
 #' @return Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
 #' @export
 #'
-#'
 mm_ArrayData <- function(ObsIDs, ObsDays, ObsValue, ObsMid, StartDay = 1, EndDay = NULL, ScaleTo, ScaleToMid = NULL){
   ObsIDs <- as.factor(ObsIDs)
   IDlevs <- levels(ObsIDs)
@@ -76,6 +75,10 @@ mm_ArrayData <- function(ObsIDs, ObsDays, ObsValue, ObsMid, StartDay = 1, EndDay
   }
   return(aDat)
 }
+
+
+
+
 
 #' Min-Max Scaling
 #'

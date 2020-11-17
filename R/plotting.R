@@ -2,6 +2,8 @@
 #'
 #' Plot Raw (alinged) data along side by side with imputed data.
 #'
+#'
+#' @name mm_CheckInt
 #' @param A1 An aligned array, containng missing data (presumably made with \code{\link{mm_ArrayData}})
 #' @param A2 An aligned and imputed array (presumbably made with \code{\link{mm_FillMissing}})
 #' @param ObO One-by-One. If TRUE (default), individuals will be plotted one at a time, requiring the user to advance/exit the operation. If FALSE, all plots will be generated at once to be browsed/exported from  the Plot History
@@ -42,16 +44,16 @@ mm_CheckInt <- function(A1, A2, ObO = TRUE){
 
 
 #' Plot Array
-#'
 #' Plot individuals and optionally mean form
+#' @name mm_PlotArray
 #'
-#'  @param A An array to be plotted
-#'  @param MeanShape Logical. Should the Mean Shape be calculated and plotted
-#'  @param AllCols Either a single color for all individuals, or a vector specifying colors for each individual. If NULL (default) individuals will be plotted in grey
-#'  @param MeanCol A single color for the mean shape. If Null (default) mean shape will be plotted in black
-#'  @param type Should the data be plotted as points or lines.
+#' @param A An array to be plotted
+#' @param MeanShape Logical. Should the Mean Shape be calculated and plotted
+#' @param AllCols Either a single color for all individuals, or a vector specifying colors for each individual. If NULL (default) individuals will be plotted in grey
+#' @param MeanCol A single color for the mean shape. If Null (default) mean shape will be plotted in black
+#' @param type Should the data be plotted as points or lines.
 #'
-#'  @export
+#' @export
 #'
 mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, type = c("pts", "lines")){
   n <- dim(A)[[3]]
@@ -142,11 +144,11 @@ mm_ScreePlot <- function(x, maxC = 15, ...) {
 #' Silouhete Width Plot
 #'
 #' Plot average silhouete widths to evaluate clusters
-#'  @param x Input data for cluster analysis (IE PCA)
-#'  @param maxC Maximum clusters to evaluate
-#'  @param ... additional arguments passed to plot
+#' @param x Input data for cluster analysis (IE PCA)
+#' @param maxC Maximum clusters to evaluate
+#' @param ... additional arguments passed to plot
 #'
-#'  @export
+#' @export
 #'
 mm_SilPlot <- function(x, maxC=15, ...) {
   sw <- 0

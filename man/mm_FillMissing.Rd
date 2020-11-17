@@ -2,15 +2,6 @@
 % Please edit documentation in R/align.R
 \name{mm_FillMissing}
 \alias{mm_FillMissing}
-\alias{Fill}
-\alias{in}
-\alias{a}
-\alias{ragged}
-\alias{away}
-\alias{by}
-\alias{nearest}
-\alias{neighbor}
-\alias{imputation}
 \title{Impute Missing Data}
 \usage{
 mm_FillMissing(A, knn = 3, scale = c("none", "MinMax", "Geom"))
@@ -23,5 +14,5 @@ mm_FillMissing(A, knn = 3, scale = c("none", "MinMax", "Geom"))
 \item{scale}{Type of scaling to implement (or not). Must be one of "none", "MinMax", "Geom"}
 }
 \description{
-Impute Missing Data
+Fill in a ragged away by nearest neighbor imputation
 }

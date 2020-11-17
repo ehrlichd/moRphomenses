@@ -2,7 +2,8 @@
 % Please edit documentation in R/plotting.R
 \name{mm_PlotArray}
 \alias{mm_PlotArray}
-\title{Plot Array}
+\title{Plot Array
+Plot individuals and optionally mean form}
 \usage{
 mm_PlotArray(
   A,
@@ -12,15 +13,18 @@ mm_PlotArray(
   type = c("pts", "lines")
 )
 }
-\description{
-Plot individuals and optionally mean form
-}
-\details{
-@param A An array to be plotted
-@param MeanShape Logical. Should the Mean Shape be calculated and plotted
-@param AllCols Either a single color for all individuals, or a vector specifying colors for each individual. If NULL (default) individuals will be plotted in grey
-@param MeanCol A single color for the mean shape. If Null (default) mean shape will be plotted in black
-@param type Should the data be plotted as points or lines.
+\arguments{
+\item{A}{An array to be plotted}
 
-@export
+\item{MeanShape}{Logical. Should the Mean Shape be calculated and plotted}
+
+\item{AllCols}{Either a single color for all individuals, or a vector specifying colors for each individual. If NULL (default) individuals will be plotted in grey}
+
+\item{MeanCol}{A single color for the mean shape. If Null (default) mean shape will be plotted in black}
+
+\item{type}{Should the data be plotted as points or lines.}
+}
+\description{
+Plot Array
+Plot individuals and optionally mean form
 }

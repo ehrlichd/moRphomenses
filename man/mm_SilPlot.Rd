@@ -6,12 +6,13 @@
 \usage{
 mm_SilPlot(x, maxC = 15, ...)
 }
+\arguments{
+\item{x}{Input data for cluster analysis (IE PCA)}
+
+\item{maxC}{Maximum clusters to evaluate}
+
+\item{...}{additional arguments passed to plot}
+}
 \description{
 Plot average silhouete widths to evaluate clusters
-@param x Input data for cluster analysis (IE PCA)
-@param maxC Maximum clusters to evaluate
-@param ... additional arguments passed to plot
-}
-\details{
-@export
 }

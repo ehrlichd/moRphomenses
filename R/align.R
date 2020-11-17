@@ -1,9 +1,9 @@
 #' Array Data
-#' @aliases mm_ArrayData
+#'
 #'
 #' Construct a ragged array (containing missing data) of a specified length (up/down sampling individuals to fit).
 #'
-#'
+#' @name mm_ArrayData
 #' @param ObsIDs A vector that contains indiviaul IDs repeated for muliple days of collection.
 #' @param ObsDays A vector that contains information on time, IE Day 1, Day 2, Day 3. Note: this vector should include integers, continuous data might produce unintended results.
 #' @param ObsValue A vector containing the variable sampled.
@@ -113,10 +113,10 @@ mm_GeomScale <- function(x){
 
 
 #' Impute Missing Data
-#' @aliases mm_FillMissing
+#'
 #'
 #' Fill in a ragged away by nearest neighbor imputation
-#'
+#'@name mm_FillMissing
 #' @param A A ragged array, presumably constructed with \code{\link{mm_ArrayData}}.
 #' @param knn Number of nearest neighbors to draw on for imputation (default = 3).
 #' @param scale Type of scaling to implement (or not). Must be one of "none", "MinMax", "Geom"
@@ -177,10 +177,10 @@ mm_FillMissing <- function(A, knn = 3, scale = c("none", "MinMax", "Geom")){
 
 
 #' Create equallly spaced intervals.
-#' @aliases mm_GetInterval
+#'
 #'
 #' Create a sequence from -1:1 of specified length. Midpoint (day0) can be
-#'
+#' @name mm_GetInterval
 #' @param days The number of days(divisions) fit between -1 and 1 (inclusive)
 #' @param day0 If NULL (default), the median integer will be calculated. This produces symmetrical ranges when days = odd number. Can be specified for asymmetric ranges.
 #'

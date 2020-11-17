@@ -2,21 +2,6 @@
 % Please edit documentation in R/align.R
 \name{mm_ArrayData}
 \alias{mm_ArrayData}
-\alias{Construct}
-\alias{a}
-\alias{ragged}
-\alias{array}
-\alias{(containing}
-\alias{missing}
-\alias{data)}
-\alias{of}
-\alias{specified}
-\alias{length}
-\alias{(up/down}
-\alias{sampling}
-\alias{individuals}
-\alias{to}
-\alias{fit).}
 \title{Array Data}
 \usage{
 mm_ArrayData(
@@ -52,5 +37,5 @@ Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
 @export
 }
 \description{
-Array Data
+Construct a ragged array (containing missing data) of a specified length (up/down sampling individuals to fit).
 }

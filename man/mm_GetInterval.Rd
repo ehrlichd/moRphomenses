@@ -2,18 +2,6 @@
 % Please edit documentation in R/align.R
 \name{mm_GetInterval}
 \alias{mm_GetInterval}
-\alias{Create}
-\alias{a}
-\alias{sequence}
-\alias{from}
-\alias{-1:1}
-\alias{of}
-\alias{specified}
-\alias{length.}
-\alias{Midpoint}
-\alias{(day0)}
-\alias{can}
-\alias{be}
 \title{Create equallly spaced intervals.}
 \usage{
 mm_GetInterval(days, day0 = NULL)
@@ -24,7 +12,7 @@ mm_GetInterval(days, day0 = NULL)
 \item{day0}{If NULL (default), the median integer will be calculated. This produces symmetrical ranges when days = odd number. Can be specified for asymmetric ranges.}
 }
 \description{
-Create equallly spaced intervals.
+Create a sequence from -1:1 of specified length. Midpoint (day0) can be
 }
 \examples{
 mm_GetInterval(15) ## Symmetrical sequence from -1 to 1 with 0 in the middle.

@@ -14,7 +14,7 @@
 #' @param ScaleToMid If NULL (default) 0 will be centered using mm_interval.
 #'
 #' @return Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
-#'  @export
+#' @export
 #'
 #'
 mm_ArrayData <- function(ObsIDs, ObsDays, ObsValue, ObsMid, StartDay = 1, EndDay = NULL, ScaleTo, ScaleToMid = NULL){
@@ -116,7 +116,7 @@ mm_GeomScale <- function(x){
 #'
 #'
 #' Fill in a ragged away by nearest neighbor imputation
-#'@name mm_FillMissing
+#' @name mm_FillMissing
 #' @param A A ragged array, presumably constructed with \code{\link{mm_ArrayData}}.
 #' @param knn Number of nearest neighbors to draw on for imputation (default = 3).
 #' @param scale Type of scaling to implement (or not). Must be one of "none", "MinMax", "Geom"

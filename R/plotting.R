@@ -221,7 +221,7 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
   for(i in 1:length(k)){
     grpID[[i]] <- data.frame(
       "grpID" = dendextend::cutree(hcl,k = k[i]),
-      "grpCol" = character()
+      "grpCol" = character(n)
       )
 
     names(grpShapes[[i]]) <- names(grpID[[i]]) <- paste("g",k[i], sep="")

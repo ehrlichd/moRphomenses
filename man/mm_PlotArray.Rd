@@ -10,7 +10,8 @@ mm_PlotArray(
   MeanShape = TRUE,
   AllCols = NULL,
   MeanCol = NULL,
-  type = c("pts", "lines")
+  type = c("pts", "lines"),
+  lbl = NULL
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ mm_PlotArray(
 \item{MeanCol}{A single color for the mean shape. If Null (default) mean shape will be plotted in black}
 
 \item{type}{Should the data be plotted as points or lines.}
+
+\item{lbl}{A title (main =) for the plot. If NULL (default) the name of the array will be used.}
 }
 \description{
 Plot Array

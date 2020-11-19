@@ -52,10 +52,10 @@ mm_CheckInt <- function(A1, A2, ObO = TRUE){
 #' @param AllCols Either a single color for all individuals, or a vector specifying colors for each individual. If NULL (default) individuals will be plotted in grey
 #' @param MeanCol A single color for the mean shape. If Null (default) mean shape will be plotted in black
 #' @param type Should the data be plotted as points or lines.
-#'
+#' @param lbl A title (main =) for the plot. If NULL (default) the name of the array will be used.
 #' @export
 #'
-mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, type = c("pts", "lines")){
+mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, type = c("pts", "lines"), lbl = NULL){
   n <- dim(A)[[3]]
   if(is.null(AllCols)){
     AllCols <- "grey"
@@ -69,10 +69,16 @@ mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, ty
     MeanCol <- "black"
   }
 
+  if(is.null(lbl)){
+    lbl <- deparse(substitute(A))
+  }
+
   y <- range(A[,2,], na.rm = T)
 
   mshp <- apply(A, c(1,2), mean)
-  plot(mshp, type = "n", main = deparse(substitute(A)), ylim = y, xlab = "", ylab = "")
+  plot(
+    mar = c(1,2,1,1),
+    mshp, type = "n", main = lbl, ylim = y, xlab = "", ylab = "")
 
   if(type == "pts"){
     for(i in 1:n){
@@ -195,12 +201,16 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
 
   if(is.null(k)){
 
+    layout(matrix(1))
     barplot(summary(PCA)$importance[2,1:maxPC], main = "PC Loadings")
     abline(h = .05, col = "red")
     abline(h = .01, col = "dark red")
     pairs(PCA$x[,1:maxPC])
+
+    layout(matrix(1))
     plot(PCA$x[,1:2])
 
+    layout(matrix(1))
     plot(hcl)
 
     layout(matrix(1:2, ncol = 2))
@@ -212,46 +222,63 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
       "PCA" = PCA,
       "Dendro" = hcl
     )
+    layout(matrix(1))
     return(out)
 
   }
 
   grpID <- list()
   grpShapes <- list()
+
   for(i in 1:length(k)){
     grpID[[i]] <- data.frame(
       "grpID" = dendextend::cutree(hcl,k = k[i]),
       "grpCol" = character(n)
       )
+    grpShapes[[i]] <- list()
 
-    names(grpShapes[[i]]) <- names(grpID[[i]]) <- paste("g",k[i], sep="")
-
+    grpID[[i]]$grpCol <- as.character(grpID[[i]]$grpCol)
 
     cols <- rainbow(k[i], s = .4, v = 1) ## light tint
     mcols <- rainbow(k[i], s = 1, v = .4) ## dark shade
 
     for(j in 1:k[i]){
-      grpID[[i]][grpID[[i]][,1]==j,2] <- cols[j]
+      grpID[[i]][grpID[[i]]$grpID==j,2] <- cols[j]
     }
 
-    barplot(summary(PCA$x)$importance[2,1:maxPC], main = "PC Loadings")
+    layout(matrix(1))
+    barplot(summary(PCA)$importance[2,1:maxPC], main = "PC Loadings")
     abline(h = .05, col = "red")
     abline(h = .01, col = "dark red")
     pairs(PCA$x[,1:3], col = grpID[[i]][,2])
+    layout(matrix(1))
     plot(PCA$x[,1:2], col = grpID[[i]][,2])
 
 
-    cols <- grpID[[i]][,2][order.dendrogram(hcl)]
-    dendextend::labels_colors(hcl) <- cols
+    treecols <- grpID[[i]][,2][order.dendrogram(hcl)]
+    dendextend::labels_colors(hcl) <- treecols
+    layout(matrix(1))
     plot(hcl)
 
-    layout(matrix(1:k[i]))
-    for(q in 1:k[i]){
-      mm_PlotArray(A=A[,,grpID[[i]][,1]==q],AllCols = cols[i], MeanCol = mcols[i], type = "lines")
-
-      grpShapes[[i]][[q]] <- apply(A[,,grpID[[i]][,1]==q],c(1,2), mean)
-
+    if(k[i] <=3){
+      layout(matrix(1:k[i], nrow =1))
+    } else if (k[i] >3 & k[i] <9){
+      layout(matrix(1:k[i], nrow = 2))
+    } else if (k[i] > 8 & k[i] < 16){
+      layout(matrix(1:k[i], nrow = 3))
+    } else {
+      layout(matrix(1:k[i], nrow = 4))
     }
+
+    for(q in 1:k[i]){
+      mm_PlotArray(A=A[,,grpID[[i]][,1]==q],AllCols = cols[q], MeanCol = mcols[q], type = "lines", lbl = paste("g",q,sep=""))
+
+     grpShapes[[i]][[q]] <- apply(A[,,grpID[[i]]$grpID==q],c(1,2), mean)
+    }
+    layout(matrix(1))
+
+    names(grpShapes)[[i]] <- paste("g",k[i], sep="")
+    names(grpID)[[i]] <- paste("g",k[i], sep="")
 
     layout(matrix(1:2, ncol = 2))
     mm_ScreePlot(PCA$x[,1:maxPC])
@@ -259,11 +286,13 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
     layout(matrix(1))
 
   }
+
   out <- list(
     "PCA" = PCA,
     "Dendro" = hcl,
     "Groups" = grpID,
     "Shapes" = grpShapes
   )
+  layout(matrix(1))
   return(out)
 }

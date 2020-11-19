@@ -195,7 +195,7 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
 
   if(is.null(k)){
 
-    barplot(summary(PCA$x)$importance[2,1:maxPC], main = "PC Loadings")
+    barplot(summary(PCA)$importance[2,1:maxPC], main = "PC Loadings")
     pairs(PCA$x[,1:3])
     plot(PCA$x[,1:2])
 

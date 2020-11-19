@@ -196,19 +196,21 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
   if(is.null(k)){
 
     barplot(summary(PCA)$importance[2,1:maxPC], main = "PC Loadings")
-    pairs(PCA$x[,1:3])
+    abline(h = .05, col = "red")
+    abline(h = .01, col = "dark red")
+    pairs(PCA$x[,1:maxPC])
     plot(PCA$x[,1:2])
 
     plot(hcl)
 
-    layout(matrix(1:2))
+    layout(matrix(1:2, ncol = 2))
     mm_ScreePlot(PCA$x[,1:maxPC])
     mm_SilPlot(PCA$x[,1:maxPC])
     layout(matrix(1))
 
     out <- list(
-      "PCA" <- PCA,
-      "Dendro" <- hcl
+      "PCA" = PCA,
+      "Dendro" = hcl
     )
     return(out)
 
@@ -218,11 +220,11 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
   grpShapes <- list()
   for(i in 1:length(k)){
     grpID[[i]] <- data.frame(
-      "grpID" = stats::cutree(hcl,k = k[i]),
+      "grpID" = dendextend::cutree(hcl,k = k[i]),
       "grpCol" = character()
       )
 
-    grpShapes[[i]] <- names(grpID[[i]]) <- paste("g",k[i], sep="")
+    names(grpShapes[[i]]) <- names(grpID[[i]]) <- paste("g",k[i], sep="")
 
 
     cols <- rainbow(k[i], s = .4, v = 1) ## light tint
@@ -233,6 +235,8 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
     }
 
     barplot(summary(PCA$x)$importance[2,1:maxPC], main = "PC Loadings")
+    abline(h = .05, col = "red")
+    abline(h = .01, col = "dark red")
     pairs(PCA$x[,1:3], col = grpID[[i]][,2])
     plot(PCA$x[,1:2], col = grpID[[i]][,2])
 
@@ -249,17 +253,17 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
 
     }
 
-    layout(matrix(1:2))
+    layout(matrix(1:2, ncol = 2))
     mm_ScreePlot(PCA$x[,1:maxPC])
     mm_SilPlot(PCA$x[,1:maxPC])
     layout(matrix(1))
 
   }
   out <- list(
-    "PCA" <- PCA,
-    "Dendro" <- hcl,
-    "Groups" <- grpID,
-    "Shapes" <- grpShapes
+    "PCA" = PCA,
+    "Dendro" = hcl,
+    "Groups" = grpID,
+    "Shapes" = grpShapes
   )
   return(out)
 }

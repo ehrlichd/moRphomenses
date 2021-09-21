@@ -11,7 +11,8 @@ mm_PlotArray(
   AllCols = NULL,
   MeanCol = NULL,
   type = c("pts", "lines"),
-  lbl = NULL
+  lbl = NULL,
+  yr = NULL
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ mm_PlotArray(
 \item{type}{Should the data be plotted as points or lines.}
 
 \item{lbl}{A title (main =) for the plot. If NULL (default) the name of the array will be used.}
+
+\item{yr}{Y-range, in the form c(0,100)}
 }
 \description{
 Plot Array

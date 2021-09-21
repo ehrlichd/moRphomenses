@@ -53,10 +53,23 @@ mm_CheckInt <- function(A1, A2, ObO = TRUE){
 #' @param MeanCol A single color for the mean shape. If Null (default) mean shape will be plotted in black
 #' @param type Should the data be plotted as points or lines.
 #' @param lbl A title (main =) for the plot. If NULL (default) the name of the array will be used.
+#' @param yr Y-range, in the form c(0,100)
 #' @export
 #'
-mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, type = c("pts", "lines"), lbl = NULL){
-  n <- dim(A)[[3]]
+#'
+#'
+
+mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, type = c("pts", "lines"), lbl = NULL, yr = NULL){
+  ## added lbl and yr arguments
+  ## added flexibility for missing data (i think)
+  ## can handle groups of n=1
+
+  if(length(dim(A)) != 3){
+    n <- 1
+  } else {
+    n <- dim(A)[[3]]
+  }
+
   if(is.null(AllCols)){
     AllCols <- "grey"
   }
@@ -73,9 +86,32 @@ mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, ty
     lbl <- deparse(substitute(A))
   }
 
-  y <- range(A[,2,], na.rm = T)
+  if(is.null(yr)){
+    y <- range(A[,2,], na.rm = T)
+  } else {
+    y <- yr
+  }
 
-  mshp <- apply(A, c(1,2), mean)
+  if(n == 1){
+    mshp <- A
+
+    if(type == "pts"){
+      plot( mar = c(1,2,1,1),
+            mshp, col = MeanCol, cex = 1.5, main = lbl, ylim = y, xlab = "", ylab = "")
+    } else {
+      plot( mar = c(1,2,1,1),
+            mshp, col = MeanCol, type = "l", lwd = 3, main = lbl, ylim = y, xlab = "", ylab = "")
+    }
+
+    return()
+
+  } else {
+    mshp <- apply(A, c(1,2),
+                  function(x){
+                    mean(x, na.rm= T)
+                  })
+  }
+
   plot(
     mar = c(1,2,1,1),
     mshp, type = "n", main = lbl, ylim = y, xlab = "", ylab = "")
@@ -94,6 +130,126 @@ mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, ty
     }
     if(MeanShape){
       points(mshp, col = MeanCol, type = "l", lwd = 3)
+    }
+  }
+}
+
+
+#' Plot Arrays of groups
+#'
+#' Attempts to optimally format a grid of arrays by group
+#'
+#' 4 Groups will plot as a 2x2 grid, while 9 groups plot in a 3x3.
+#' Function is experimental
+#'
+#' @param A an array to be plotted
+#' @param grps a vector defining group IDs to subset along the 3rd dimension of the array
+#' @export
+
+mm_grps_PlotArray <- function(A, grps){
+
+  k <- length(levels(as.factor(grps)))
+
+  cols <- rainbow(k, s= .4, v = 1)
+  mcols <- rainbow(k, s = 1, v = .4)
+
+  ## Set layout for plotting - this needs work; plot margins can be a big issue
+  if (k %in% c(1,2,3)){
+    layout(matrix(1:k, ncol = k))
+  } else if (k %% 3 == 0){
+    layout(matrix(1:k, nrow = 3))
+  } else if (k %% 2 == 0){
+    layout(matrix(1:k, nrow = 2))
+  }  else {
+    layout(matrix(1:k, ncol = k))
+  }
+
+
+  for(q in 1:k){
+    mm_PlotArray(A=A[,,grps==q],AllCols = cols[q], MeanCol = mcols[q], type = "lines", lbl = paste("g",q,sep=""), yr = range(A[,2,],na.rm = T))
+  }
+  layout(matrix(1))
+}
+
+
+
+
+#' Color leves of a dendrogram
+#'
+#' Specify color order approriately for a dendrogram
+#'
+#' Leaves of a dendrogram will be re-ordered compared to most input classifiers. This function takes the study-ordered colors and correctly applies them to the dendrogram using \code{dendextend}
+#'
+#' @param dendro A dendrogram class object
+#' @param cols a vector of colors
+#' @export
+
+mm_ColorLeaves <- function(dendro, cols){
+  xcols <- cols[order.dendrogram(dendro)]
+  dendextend::labels_colors(dendro) <- xcols
+  return(dendro)
+}
+
+
+#' Calculate elipses by groups
+#'
+#' Calculate coordinates of 3D elipsoids using \code{rgl}
+#'
+#' @param dat A 2D matrix, most likely PC scores
+#' @param grps A vector of group IDs
+#' @param confidence CI to draw ellipses at. Default is 95%
+#' @return If successful, returns a mesh3d object (list) to be plotted with rgl functions. See \code{mm_add_ellipses}.
+#' @export
+#'
+#'
+#'
+mm_grp_Ellipses <- function(dat, grps, confidence = .95){
+  fgrps <- as.factor(grps)
+  k <- length(levels(fgrps))
+  out <- vector(mode = "list", length = k)
+  for ( i in seq_along(out)){
+    out[[i]] <- NULL
+
+    out[[i]] <- try(rgl::ellipse3d(x= cov(dat[fgrps==i,]),
+                              centre = colMeans(dat[fgrps==i,]),
+                              level = confidence), silent = TRUE)
+  }
+  names(out) <- paste0("g",1:k)
+  return(out)
+}
+
+#' Add ellipses to plot
+#'
+#' Once mesh3d objects are calculated, add them to the current rgl window
+#'
+#' mesh3d ellipses must be clalculated first using \code{mm_grp_Ellipses()} and the output saved to an object. That object is used for \code{elist}.
+#'
+#' @param elist Output of \code{mm_grp_Ellipses}, or an otherwise defined mesh3d object.
+#' @param cols a vector of colors to plot each ellipse
+#' @param alpha optional value to specify transparency 0 = invisible, 1 = opqaue.
+#'
+#' @export
+#'
+#'
+mm_add_ellipses <- function(elist, cols, alpha){
+  l <- length(elist)
+  if(length(cols)==1){
+    allCols <- rep(cols, l)
+  } else {
+    allCols <- cols
+  }
+
+  if(length(alpha)==1){
+    allAlpha <- rep(alpha,l)
+  } else {
+    allAlpha <- alpha
+  }
+
+  for(i in seq_along(elist)){
+    if(class(elist[[i]]) != "mesh3d"){
+      next
+    } else {
+      shade3d(elist[[i]],col = allCols[i], alpha = allAlpha[i])
     }
   }
 }
@@ -195,6 +351,29 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
 
   PCA <- prcomp(A1)
 
+  PCA$shapes <- list()
+
+  for(i in 1:maxPC){
+
+    PCA$shapes[[i]] <- geomorph::shape.predictor(
+        A = A,
+        x = PCA$x[,i],
+        min = min(PCA$x[,i]),
+        max = max(PCA$x[,i]))
+
+  }
+  names(PCA$shapes) <- paste0("PC", 1:maxPC)
+
+  for(i in seq_along(PCA$shapes)){
+    PCA$shapes[[i]] <- lapply(PCA$shapes[[i]], function(x){
+      lapply(x, function(x){
+        x <- matrix(x, nrow = 28)
+      })
+    })
+  }
+
+
+
   hcl <- hclust(dist(PCA$x),method = "ward.D2")
   hcl <- as.dendrogram(hcl)
 
@@ -234,7 +413,7 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
     grpID[[i]] <- data.frame(
       "grpID" = dendextend::cutree(hcl,k = k[i]),
       "grpCol" = character(n)
-      )
+    )
     grpShapes[[i]] <- list()
 
     grpID[[i]]$grpCol <- as.character(grpID[[i]]$grpCol)
@@ -254,28 +433,12 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
     layout(matrix(1))
     plot(PCA$x[,1:2], col = grpID[[i]][,2])
 
-
-    treecols <- grpID[[i]][,2][order.dendrogram(hcl)]
-    dendextend::labels_colors(hcl) <- treecols
     layout(matrix(1))
-    plot(hcl)
-
-    if(k[i] <=3){
-      layout(matrix(1:k[i], nrow =1))
-    } else if (k[i] >3 & k[i] <9){
-      layout(matrix(1:k[i], nrow = 2))
-    } else if (k[i] > 8 & k[i] < 16){
-      layout(matrix(1:k[i], nrow = 3))
-    } else {
-      layout(matrix(1:k[i], nrow = 4))
-    }
+    plot(mm_ColorLeaves(hcl, grpID[[i]][,2]))
 
     for(q in 1:k[i]){
-      mm_PlotArray(A=A[,,grpID[[i]][,1]==q],AllCols = cols[q], MeanCol = mcols[q], type = "lines", lbl = paste("g",q,sep=""))
-
-     grpShapes[[i]][[q]] <- apply(A[,,grpID[[i]]$grpID==q],c(1,2), mean)
+      grpShapes[[i]][[q]] <- apply(A[,,grpID[[i]]$grpID==q],c(1,2), mean)
     }
-    layout(matrix(1))
 
     names(grpShapes)[[i]] <- paste("g",k[i], sep="")
     names(grpID)[[i]] <- paste("g",k[i], sep="")
@@ -296,3 +459,110 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
   layout(matrix(1))
   return(out)
 }
+
+
+#' Visualize PC axes
+#'
+#' Plot a scatterplot and vizualize shape change across the X axis.
+#'
+#' Meant to be a quick diagnostic plot with minimal customization.
+#'
+#' @param pheno Output of \code{mm_phenotype}, containing a PCA object with PC shapes
+
+
+pheno_plot <- function(pheno, xPC = 1, yPC = 2, yr = c(0,1), title = ""){
+
+  eig <- summary(pheno$PCA)$importance
+  layout(matrix(1:3, ncol =3))
+
+  x_r <- range(pheno$PCA$x[,xPC])
+  y_r <- range(pheno$PCA$x[,yPC])
+
+  yax <- seq(from = y_r[1], to = y_r[2], length.out = 5)
+  xax <- seq(from = x_r[1], to = x_r[2], length.out = 5)
+
+  x_lab <- paste("PC", xPC, ": ", eig[2,xPC]*100, "% Var")
+  y_lab <- paste("PC", yPC, ": ", eig[2,yPC]*100, "% Var")
+
+  plot(pheno$PCA$shapes[[xPC]]$min, col = "cyan", bty = "n", xlab = "", ylab = "", type = "l", lwd = 2, ylim = yr, main = paste("PC", xPC, "min"))
+  points(pheno$PCA$shapes$GrandM, col = "grey", type = "l")
+
+
+  plot(pheno$PCA$x[,c(xPC,yPC)], main = title, xlab = x_lab, ylab = y_lab, as= T, bty = "n", xaxt = "n", yaxt = "n", type = "n")
+  abline(h = 0, col = "grey", lty = 2)
+  abline(v = 0, col = "grey", lty = 2)
+
+  #text(rep(0, 5), yax, labels = round(yax),cex = 1, col = "red",pos = 4)
+  #text(xax, rep(0, 5), labels = round(xax),cex = 1, col = "blue", pos = 1)
+
+  points(pheno$PCA$x[,c(xPC,yPC)])
+
+  plot(pheno$PCA$shapes[[xPC]]$max, col = "blue", bty = "n", xlab = "", ylab = "", type = "l", lwd = 2, ylim = yr, main = paste("PC", xPC, "max"))
+  points(pheno$PCA$shapes$GrandM, col = "grey", type = "l")
+
+}
+
+
+#' Distance from Centroid
+#'
+#' Calculate and plot group distance from centroid (grand mean)
+#'
+#' @param dat a 2d matrix of data. Presumably PC scores
+#' @param grps a vector defining group IDs
+#' @param plots Logical. Should distances be plotted as vusing boxplots? If FALSE, distance calculations are still performed
+#' @export
+#'
+
+mm_grp_dists <- function(dat, grps, plots  = TRUE){
+  fgrps <- as.factor(grps)
+  k <- length(levels(fgrps))
+  n <- nrow(dat)
+
+  out <- list()
+  evals <- vector(mode = "list", length = k)
+
+  for(i in seq_along(evals)){
+    ss <- dat[fgrps==i,]
+    cent <- colMeans(ss)
+    l <- dim(ss)[1]
+    evals[[i]] <- numeric(l)
+
+    for(j in 1:l){
+      evals[[i]][[j]] <- sqrt(sum((ss[j,]-cent)^2))
+    }
+  }
+  names(evals) <- paste("g",1:k,sep="")
+
+  evals$Grand <- numeric(n)
+
+  ss <- dat[,]
+  cent <- colMeans(ss)
+  for(i in 1:n){
+    evals$Grand[i] <- sqrt(sum((ss[i,]-cent)^2))
+  }
+
+  ## reformat for plotting
+  bplots <- data.frame("error" = numeric(n*2), "grps" = factor(n*2))
+  bb1 <- NULL
+  bb2 <- NULL
+
+  ntab <- as.numeric(table(fgrps))
+  ntab <- c(ntab, n)
+
+  for (i in seq_along(evals)){
+    bb1 <- c(bb1, evals[[i]])
+    bb2 <- c(bb2, rep(names(evals)[i], each = ntab[i]))
+  }
+  bplots[,1] <- bb1
+  bplots[,2] <- bb2
+
+  if(plots == TRUE){
+    boxplot(bplots$error ~ bplots$grps, col = c(rainbow(k, s = .4), "grey"), xlab = "grps", ylab = "Distance from Centroid",notch = TRUE)
+  }
+  out$evals <- evals
+  out$plotting <- bplots
+  return(out)
+
+}
+
+

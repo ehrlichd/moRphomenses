@@ -365,11 +365,8 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
   names(PCA$shapes) <- paste0("PC", 1:maxPC)
 
   for(i in seq_along(PCA$shapes)){
-    PCA$shapes[[i]] <- lapply(PCA$shapes[[i]], function(x){
-      lapply(x, function(x){
-        x <- matrix(x, nrow = 28)
-      })
-    })
+    PCA$shapes[[i]]$min <- matrix(PCA$shapes[[i]]$min, nrow = dim(A)[[1]])
+    PCA$shapes[[i]]$max <- matrix(PCA$shapes[[i]]$max, nrow = dim(A)[[1]])
   }
 
 
@@ -470,7 +467,7 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
 #' @param pheno Output of \code{mm_phenotype}, containing a PCA object with PC shapes
 
 
-pheno_plot <- function(pheno, xPC = 1, yPC = 2, yr = c(0,1), title = ""){
+mm_pheno_plot <- function(pheno, xPC = 1, yPC = 2, yr = c(0,1), title = ""){
 
   eig <- summary(pheno$PCA)$importance
   layout(matrix(1:3, ncol =3))

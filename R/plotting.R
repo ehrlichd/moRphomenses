@@ -371,7 +371,7 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
 
 
 
-  hcl <- hclust(dist(PCA$x),method = "ward.D2")
+  hcl <- hclust(dist(PCA$x[,1:maxPC]),method = "ward.D2")
   hcl <- as.dendrogram(hcl)
 
 
@@ -465,6 +465,10 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
 #' Meant to be a quick diagnostic plot with minimal customization.
 #'
 #' @param pheno Output of \code{mm_phenotype}, containing a PCA object with PC shapes
+#' @param xPC The PC to be plotted on the x axis
+#' @param yPC The PC to be plotted on the y axis
+#' @param yr The y-xis range, in the format c(0,1)
+#' @param title To be used for the plot
 
 
 mm_pheno_plot <- function(pheno, xPC = 1, yPC = 2, yr = c(0,1), title = ""){

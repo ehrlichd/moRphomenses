@@ -12,7 +12,7 @@
 #'   ...
 #' }
 #'
-"mm_data_array"
+
 
 #' Sample hormone classifiers
 #'
@@ -31,7 +31,7 @@
 #'   ...
 #' }
 #'
-"mm_data_short"
+
 
 #' Sample hormone data - long format
 #'
@@ -55,4 +55,3 @@
 #'   ...
 #' }
 #'
-"mm_data_long"

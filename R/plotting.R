@@ -332,7 +332,7 @@ mm_SilPlot <- function(x, maxC=15, ...) {
 #' Apply PCA and Hierarchical Clustering to infer phenotypes
 #'
 #' @param A an array to be analyzed. No missing data allowed (see \code{\link{mm_FillMissing}})
-#' @param k The number of groups for which phenotypes will be drawn. If NULL (default) Diagnostic plots will be drawn to help gauge approprite k
+#' @param k The number of groups for which phenotypes will be drawn. If NULL (default) Diagnostic plots will be drawn to help gauge appropriate k
 #' @param maxPC Maximum number of PCs to use in analysis.
 #'
 #' @export

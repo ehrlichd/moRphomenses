@@ -16,68 +16,76 @@
 #' @return Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
 #' @export
 #'
-mm_ArrayData <- function(ObsIDs, ObsDays, ObsValue, ObsMid, StartDay = 1, EndDay = NULL, ScaleTo, ScaleToMid = NULL){
-  ObsIDs <- as.factor(ObsIDs)
-  IDlevs <- levels(ObsIDs)
-  if(length(ObsMid) != length(IDlevs)){
-    stop("length of 'ObsMid' not equal to number of individuals")
-  }
-  if(!all(length(ObsDays) == length(ObsValue) |
-          length(ObsDays)== length(ObsIDs) |
-          length(ObsValue == length(ObsIDs)))){
-    stop("length of observations not equal")
-  }
+mm_ArrayData <-
+  function(ObsIDs,
+           ObsDays,
+           ObsValue,
+           ObsMid,
+           StartDay = 1,
+           EndDay = NULL,
+           ScaleTo,
+           ScaleToMid = NULL) {
 
-  aDat <- array(dim = c(ScaleTo, 2, length(IDlevs)))
-  dimnames(aDat)[[3]] <- IDlevs
-  mshpx <- mm_GetInterval(days = ScaleTo, day0 = ScaleToMid)
+    ObsIDs <- as.factor(ObsIDs)
+    IDlevs <- levels(ObsIDs)
 
-  dat1 <- cbind(ObsIDs, ObsDays, ObsValue)
-
-  for (i in 1:length(IDlevs)){
-
-    ## ID, ObsDay, ObsVal
-    ss <- dat1[ObsIDs==IDlevs[i],]
-    if (is.null(EndDay)){
-      maxi <- max(ss[,2], na.rm = T) ## max day
-    } else {
-      maxi <- EndDay
+    if (length(ObsMid) != length(IDlevs)) {
+      stop("length of 'ObsMid' not equal to number of individuals")
     }
-    seq1 <- StartDay:maxi
-    anchi <- ObsMid[i]
-
-    mati <- cbind(seq1, rep(NA, length(seq1)))
-
-    ## fill in matrix for days with values present
-    mati[seq1 %in% ss[,2],2] <- ss[,3]
-
-    ## center values based on anchor day
-    seq2 <- seq1 - anchi
-    mati[,1] <- seq2
-
-    lh <- mati[seq2 < 0,]
-    cent <- mati[seq2 == 0,]
-    uh <- mati[seq2 > 0,]
-
-    ## scale fractional days
-    lh[,1] <- lh[,1]/length(lh[,1])
-    uh[,1] <- uh[,1]/length(uh[,1])
-
-    mat2 <- rbind(lh, cent, uh)
-
-    fill <- matrix(nrow = ScaleTo, ncol = 2)
-    for (j in 1:ScaleTo){
-      val <- which.min(abs(mat2[,1] - mshpx[j]))
-      fill[j,1] <- mshpx[j]
-      fill[j,2] <- mat2[val,2]
+    if (!all(
+      length(ObsDays) == length(ObsValue) |
+      length(ObsDays) == length(ObsIDs) |
+      length(ObsValue == length(ObsIDs))
+    )) {
+      stop("length of observations not equal")
     }
-    aDat[,,i] <- fill
+
+    aDat <- array(dim = c(ScaleTo, 2, length(IDlevs)))
+    dimnames(aDat)[[3]] <- IDlevs
+    mshpx <- mm_GetInterval(days = ScaleTo, day0 = ScaleToMid)
+
+    dat1 <- cbind(ObsIDs, ObsDays, ObsValue)
+
+    for (i in 1:length(IDlevs)) {
+      ## ID, ObsDay, ObsVal
+      ss <- dat1[ObsIDs == IDlevs[i], ]
+      if (is.null(EndDay)) {
+        maxi <- max(ss[, 2], na.rm = T) ## max day
+      } else {
+        maxi <- EndDay
+      }
+      seq1 <- StartDay:maxi
+      anchi <- ObsMid[i]
+
+      mati <- cbind(seq1, rep(NA, length(seq1)))
+
+      ## fill in matrix for days with values present
+      mati[seq1 %in% ss[, 2], 2] <- ss[, 3]
+
+      ## center values based on anchor day
+      seq2 <- seq1 - anchi
+      mati[, 1] <- seq2
+
+      lh <- mati[seq2 < 0, ]
+      cent <- mati[seq2 == 0, ]
+      uh <- mati[seq2 > 0, ]
+
+      ## scale fractional days
+      lh[, 1] <- lh[, 1] / length(lh[, 1])
+      uh[, 1] <- uh[, 1] / length(uh[, 1])
+
+      mat2 <- rbind(lh, cent, uh)
+
+      fill <- matrix(nrow = ScaleTo, ncol = 2)
+      for (j in 1:ScaleTo) {
+        val <- which.min(abs(mat2[, 1] - mshpx[j]))
+        fill[j, 1] <- mshpx[j]
+        fill[j, 2] <- mat2[val, 2]
+      }
+      aDat[, , i] <- fill
+    }
+    return(aDat)
   }
-  return(aDat)
-}
-
-
-
 
 
 #' Min-Max Scaling

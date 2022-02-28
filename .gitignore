@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+cmb_shapes/
+n98_sample_select.csv
+n98_sample_names.csv
+mer_ex_updated.R

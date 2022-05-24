@@ -4,14 +4,14 @@
 \alias{mm_Phenotype}
 \title{Get Phenotypes}
 \usage{
-mm_Phenotype(A, k = NULL, maxPC = 10)
+mm_Phenotype(A, maxPC = 10, k = NULL)
 }
 \arguments{
 \item{A}{an array to be analyzed. No missing data allowed (see \code{\link{mm_FillMissing}})}
 
-\item{k}{The number of groups for which phenotypes will be drawn. If NULL (default) Diagnostic plots will be drawn to help gauge approprite k}
+\item{maxPC}{Maximum number of PCs to use in analysis. The default (10) is entirely arbitrary. 10 may be too many shape variables to consider, or it may be far from enough.}
 
-\item{maxPC}{Maximum number of PCs to use in analysis.}
+\item{k}{The number of groups for which phenotypes will be drawn. If NULL (default) Diagnostic plots will be drawn to help gauge appropriate k}
 }
 \description{
 Apply PCA and Hierarchical Clustering to infer phenotypes

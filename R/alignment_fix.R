@@ -1,36 +1,19 @@
-### trying to work out new array function
-
-sub <- DataToScale[DataToScale$id %in% head(unique(DataToScale$id)),]
-ind_ovday <- ind_ovday[1:6]
-
-rm(DataToScale, data_filepath, i, sel, subset, unique_id)
 
 
-
-end_day <- NULL
-for (i in IDlevs){
-  end_day[i] <- max(sub$cycleDay[sub$id==i])
-
-}
-
-fixed <- as.data.frame(rbind(1,ind_ovday, end_day))
-
-fixed2 <- list()
-
-for(i in IDlevs){
-  fixed2[[i]] <- fixed[,i]
-}
-
-
-
-ObsIDs <- sub$id
-ObsDays <- sub$cycleDay
-ObsValue <- sub$E1G..ng.ml._adjSG
-ObsFixed <- fixed2
-
-tar_array <- array(dim = c(28,2,1))
-tar_fixed <- c(1,16,28)
-tar_scl <- c(-1,0,1)
+#' new alignment function
+#'
+#' hopefully more flexible
+#'
+#' @name new_array
+#' @param ObsIDs A vector that contains indiviaul IDs repeated for muliple days of collection.
+#' @param ObsDays A vector that contains information on time, IE Day 1, Day 2, Day 3. Note: this vector should include integers, continuous data might produce unintended results.
+#' @param ObsValue A vector containing the variable sampled.
+#' @param ObsFixed A vector containing the days to be treated as fixed. Note: ObsMid must have the same number of observations as unique Individuals.
+#' @param tar_array A standard target to align individuals. **EXPLAIN**
+#' @param tar_fixed A sequence identifying fixed landmarks in the target
+#' @param tar_scl A sequence identifying the scale
+#'
+#' @return Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
 
 
 
@@ -79,7 +62,7 @@ new_array <-
 
     ## would need another if(is.null(centered)){ anchi <- mean(seq1)}
 
-    anchi <- ObsFixed[[i]][centered]
+    cent <- median(ObsFixed)
     ## first step is to get it to 0
 
 
@@ -92,7 +75,7 @@ new_array <-
     flmi <- ObsFixed[[i]]
 
     iscl <- tar_scl/flmi
-    iscl
+
 
 
     seqs <- list()
@@ -103,7 +86,7 @@ new_array <-
     }
 
     seqs <- unique(unlist(seqs))
-    seqs
+
 
 
     mat2 <- mati
@@ -131,17 +114,5 @@ new_array <-
     aDat[, , i] <- fill
   }
   return(aDat)
-}
+  }
 
-test_array <- new_array(
-  ObsIDs = sub$id,
-  ObsDays = sub$cycleDay,
-  ObsValue = sub$E1G..ng.ml._adjSG,
-  ObsFixed = fixed2,
-
-  tar_array = array(dim = c(28,2,1)),
-  tar_fixed = c(1,16,28),
-  tar_scl = c(-1,0,1)
-  )
-
-  ### test out limiting the range of the cycle using fixed landmarks

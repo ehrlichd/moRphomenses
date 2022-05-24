@@ -10,7 +10,7 @@ mm_PlotArray(
   MeanShape = TRUE,
   AllCols = NULL,
   MeanCol = NULL,
-  type = c("pts", "lines"),
+  type = c("points", "lines"),
   lbl = NULL,
   yr = NULL
 )

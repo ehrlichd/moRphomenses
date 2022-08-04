@@ -13,7 +13,7 @@ mm_mute_cols(cols, s = NULL, v = NULL, alpha = 0.4)
 
 \item{v}{Either a single value or a vector of same length as cols specifying a new value (range 0-1). colors lighten to white (0)}
 
-\item{alhpa}{Either a single value or a vector of same length as cols specifying a transparency value (range 0-1). colors translucent at 0.}
+\item{alpha}{Either a single value or a vector of same length as cols specifying a transparency value (range 0-1). colors translucent at 0.}
 }
 \description{
 Modify color/transparency using hsv syntax

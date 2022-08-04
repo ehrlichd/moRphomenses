@@ -514,7 +514,7 @@ mm_grp_dists <- function(dat, grps, plots  = TRUE){
 #' @param cols a vector of colors, eg: "#0066FF"
 #' @param s Either a single value or a vector of same length as cols specifying a new saturation (range 0-1). colors darken to black (0)
 #' @param v Either a single value or a vector of same length as cols specifying a new value (range 0-1). colors lighten to white (0)
-#' @param alhpa Either a single value or a vector of same length as cols specifying a transparency value (range 0-1). colors translucent at 0.
+#' @param alpha Either a single value or a vector of same length as cols specifying a transparency value (range 0-1). colors translucent at 0.
 #' @export
 
 mm_mute_cols <- function(cols, s=NULL,v=NULL,alpha=.4){
@@ -535,5 +535,3 @@ mm_mute_cols <- function(cols, s=NULL,v=NULL,alpha=.4){
   return(out_col)
 }
 
-
-## should add distance matrix to dendro output

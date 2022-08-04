@@ -9,11 +9,7 @@ mm_Phenotype(A, maxPC = 10, k = NULL)
 \arguments{
 \item{A}{an array to be analyzed. No missing data allowed (see \code{\link{mm_FillMissing}})}
 
-<<<<<<< HEAD
-\item{k}{The number of groups for which phenotypes will be drawn. If NULL (default) Diagnostic plots will be drawn to help gauge appropriate k}
-=======
 \item{maxPC}{Maximum number of PCs to use in analysis. The default (10) is entirely arbitrary. 10 may be too many shape variables to consider, or it may be far from enough.}
->>>>>>> 47cf153e38a9bc3bdaa44d6c959ed8898165b44a
 
 \item{k}{The number of groups for which phenotypes will be drawn. If NULL (default) Diagnostic plots will be drawn to help gauge appropriate k}
 }

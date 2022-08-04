@@ -1,5 +1,5 @@
 Package: moRphomenses
-Title: Align, Scale, and Visualize "Shaoe" of Menstrual Cycle Hormones
+Title: Align, Scale, and Visualize "Shape" of Menstrual Cycle Hormones
 Version: 0.0.0.9000
 Authors@R: 
    person(given = "Daniel", 
@@ -8,8 +8,7 @@ Authors@R:
                     email = "dan.ehrlich.e@gmail.com")
 Description: Geometric Morphometric based methods to study the shape/phenotype of hormone concentrations across the menstrual cycle.
 License: GPL (>= 3.0)
-Imports: geomorph, dendextend, cluster
-Suggests: rgl
+Imports: dendextend, cluster
 URL: <https://github.com/ehrlichd/moRphomenses>
 Encoding: UTF-8
 LazyData: true

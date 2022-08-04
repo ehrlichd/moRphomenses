@@ -59,7 +59,7 @@ mm_CheckInt <- function(A1, A2, ObO = TRUE){
 #'
 #'
 
-mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, type = c("pts", "lines"), lbl = NULL, yr = NULL){
+mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, type = c("points", "lines"), lbl = NULL, yr = NULL){
   ## added lbl and yr arguments
   ## added flexibility for missing data (i think)
   ## can handle groups of n=1
@@ -95,7 +95,7 @@ mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, ty
   if(n == 1){
     mshp <- A
 
-    if(type == "pts"){
+    if(type == "points"){
       plot( mar = c(1,2,1,1),
             mshp, col = MeanCol, cex = 1.5, main = lbl, ylim = y, xlab = "", ylab = "")
     } else {
@@ -116,7 +116,7 @@ mm_PlotArray <- function(A, MeanShape = TRUE, AllCols = NULL, MeanCol = NULL, ty
     mar = c(1,2,1,1),
     mshp, type = "n", main = lbl, ylim = y, xlab = "", ylab = "")
 
-  if(type == "pts"){
+  if(type == "points"){
     for(i in 1:n){
       points(A[,1:2,i], col = AllCols[i])
     }
@@ -269,12 +269,13 @@ mm_SilPlot <- function(x, maxC=15, ...) {
 #' Apply PCA and Hierarchical Clustering to infer phenotypes
 #'
 #' @param A an array to be analyzed. No missing data allowed (see \code{\link{mm_FillMissing}})
+#' @param maxPC Maximum number of PCs to use in analysis. The default (10) is entirely arbitrary. 10 may be too many shape variables to consider, or it may be far from enough.
 #' @param k The number of groups for which phenotypes will be drawn. If NULL (default) Diagnostic plots will be drawn to help gauge appropriate k
-#' @param maxPC Maximum number of PCs to use in analysis.
+
 #'
 #' @export
 
-mm_Phenotype <- function(A, k = NULL, maxPC = 10){
+mm_Phenotype <- function(A, maxPC = 10, k = NULL){
 
   n <- dim(A)[[3]]
   lbl <- character(n)
@@ -305,6 +306,8 @@ mm_Phenotype <- function(A, k = NULL, maxPC = 10){
     PCA$shapes[[i]]$min <- matrix(PCA$shapes[[i]]$min, nrow = dim(A)[[1]])
     PCA$shapes[[i]]$max <- matrix(PCA$shapes[[i]]$max, nrow = dim(A)[[1]])
   }
+
+  PCA$eigs <- summary(PCA)$importance[2:3,]
 
 
 
@@ -504,3 +507,33 @@ mm_grp_dists <- function(dat, grps, plots  = TRUE){
 }
 
 
+#' Take a color and modify it
+#'
+#' Modify color/transparency using hsv syntax
+#'
+#' @param cols a vector of colors, eg: "#0066FF"
+#' @param s Either a single value or a vector of same length as cols specifying a new saturation (range 0-1). colors darken to black (0)
+#' @param v Either a single value or a vector of same length as cols specifying a new value (range 0-1). colors lighten to white (0)
+#' @param alhpa Either a single value or a vector of same length as cols specifying a transparency value (range 0-1). colors translucent at 0.
+#' @export
+
+mm_mute_cols <- function(cols, s=NULL,v=NULL,alpha=.4){
+  tmp_col <- data.frame(t(rgb2hsv(col2rgb(cols))))
+  tmp_col$alpha <- alpha
+  if(!is.null(s)){
+    tmp_col$s <- s
+  }
+  if(!is.null(v)){
+    tmp_col$v <- v
+  }
+
+  out_col <- hsv(tmp_col$h,
+                 tmp_col$s,
+                 tmp_col$v,
+                 tmp_col$alpha)
+
+  return(out_col)
+}
+
+
+## should add distance matrix to dendro output

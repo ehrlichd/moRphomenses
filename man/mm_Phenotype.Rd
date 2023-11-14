@@ -11,7 +11,7 @@ mm_Phenotype(A, maxPC = 10, k = NULL)
 
 \item{maxPC}{Maximum number of PCs to use in analysis. The default (10) is entirely arbitrary. 10 may be too many shape variables to consider, or it may be far from enough.}
 
-\item{k}{The number of groups for which phenotypes will be drawn. If NULL (default) Diagnostic plots will be drawn to help gauge appropriate k}
+\item{k}{The number of groups for which phenotypes will be drawn. If NULL (default) A SINGLE AVERAGE WILL BE DRAWN; ADD SUPORT FOR NESTED SUPBGROUPS}
 }
 \description{
 Apply PCA and Hierarchical Clustering to infer phenotypes

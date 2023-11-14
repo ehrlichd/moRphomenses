@@ -12,7 +12,7 @@ mm_GetInterval(days, day0 = NULL)
 \item{day0}{If NULL (default), the median integer will be calculated. This produces symmetrical ranges when days = odd number. Can be specified for asymmetric ranges.}
 }
 \description{
-Create a sequence from -1:1 of specified length. Midpoint (day0) can be
+Create a sequence from -1:1 of specified length. MIDpoint (day0) can be
 }
 \examples{
 mm_GetInterval(15) ## Symmetrical sequence from -1 to 1 with 0 in the middle.

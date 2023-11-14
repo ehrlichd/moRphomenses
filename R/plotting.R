@@ -531,7 +531,7 @@ mm_mute_cols <- function(cols, s=NULL,v=NULL,alpha=.4){
 
 
 
-#' Generate Diagnostic Plots
+#' Generate Diagnostic Plots WIP
 #'
 #' Generate various diagnostic plots
 #'
@@ -543,20 +543,20 @@ mm_mute_cols <- function(cols, s=NULL,v=NULL,alpha=.4){
 ## NOTE: need to figure out what the actual input/output of this should be.
 
 ## data array is one main object; how to simplyfy the results of phenotyping??
-
-layout(matrix(1))
-barplot(summary(PCA)$importance[2,1:maxPC], main = "PC Loadings")
-abline(h = .05, col = "red")
-abline(h = .01, col = "dark red")
-pairs(PCA$x[,1:maxPC])
-
-layout(matrix(1))
-plot(PCA$x[,1:2])
-
-layout(matrix(1))
-plot(hcl)
-
-layout(matrix(1:2, ncol = 2))
-mm_ScreePlot(PCA$x[,1:maxPC])
-mm_SilPlot(PCA$x[,1:maxPC])
-layout(matrix(1))
+#
+# layout(matrix(1))
+# barplot(summary(PCA)$importance[2,1:maxPC], main = "PC Loadings")
+# abline(h = .05, col = "red")
+# abline(h = .01, col = "dark red")
+# pairs(PCA$x[,1:maxPC])
+#
+# layout(matrix(1))
+# plot(PCA$x[,1:2])
+#
+# layout(matrix(1))
+# plot(hcl)
+#
+# layout(matrix(1:2, ncol = 2))
+# mm_ScreePlot(PCA$x[,1:maxPC])
+# mm_SilPlot(PCA$x[,1:maxPC])
+# layout(matrix(1))

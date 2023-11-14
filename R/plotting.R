@@ -264,13 +264,17 @@ mm_SilPlot <- function(x, maxC=15, ...) {
 
 
 
+
+## NOTE: mm_pheno should be broken up into mm_pheno and mm_diagnostics.
+
+
 #' Get Phenotypes
 #'
 #' Apply PCA and Hierarchical Clustering to infer phenotypes
 #'
 #' @param A an array to be analyzed. No missing data allowed (see \code{\link{mm_FillMissing}})
 #' @param maxPC Maximum number of PCs to use in analysis. The default (10) is entirely arbitrary. 10 may be too many shape variables to consider, or it may be far from enough.
-#' @param k The number of groups for which phenotypes will be drawn. If NULL (default) Diagnostic plots will be drawn to help gauge appropriate k
+#' @param k The number of groups for which phenotypes will be drawn. If NULL (default) A SINGLE AVERAGE WILL BE DRAWN; ADD SUPORT FOR NESTED SUPBGROUPS
 
 #'
 #' @export
@@ -317,23 +321,6 @@ mm_Phenotype <- function(A, maxPC = 10, k = NULL){
 
   if(is.null(k)){
 
-    layout(matrix(1))
-    barplot(summary(PCA)$importance[2,1:maxPC], main = "PC Loadings")
-    abline(h = .05, col = "red")
-    abline(h = .01, col = "dark red")
-    pairs(PCA$x[,1:maxPC])
-
-    layout(matrix(1))
-    plot(PCA$x[,1:2])
-
-    layout(matrix(1))
-    plot(hcl)
-
-    layout(matrix(1:2, ncol = 2))
-    mm_ScreePlot(PCA$x[,1:maxPC])
-    mm_SilPlot(PCA$x[,1:maxPC])
-    layout(matrix(1))
-
     out <- list(
       "PCA" = PCA,
       "Dendro" = hcl
@@ -347,10 +334,13 @@ mm_Phenotype <- function(A, maxPC = 10, k = NULL){
   grpShapes <- list()
 
   for(i in 1:length(k)){
-    grpID[[i]] <- data.frame(
-      "grpID" = dendextend::cutree(hcl,k = k[i]),
-      "grpCol" = character(n)
-    )
+
+    ## TODO: we want to use kboot clustering instead of cutree
+
+    # grpID[[i]] <- data.frame(
+    #   "grpID" = dendextend::cutree(hcl,k = k[i]),
+    #   "grpCol" = character(n)
+    # )
     grpShapes[[i]] <- list()
 
     grpID[[i]]$grpCol <- as.character(grpID[[i]]$grpCol)
@@ -409,6 +399,8 @@ mm_Phenotype <- function(A, maxPC = 10, k = NULL){
 #' @param yPC The PC to be plotted on the y axis
 #' @param yr The y-xis range, in the format c(0,1)
 #' @param title To be used for the plot
+
+## THIS MAY NEED TO BE MODIFIED
 
 
 mm_pheno_plot <- function(pheno, xPC = 1, yPC = 2, yr = c(0,1), title = ""){
@@ -535,3 +527,36 @@ mm_mute_cols <- function(cols, s=NULL,v=NULL,alpha=.4){
   return(out_col)
 }
 
+
+
+
+
+#' Generate Diagnostic Plots
+#'
+#' Generate various diagnostic plots
+#'
+#'
+#'
+#'
+
+
+## NOTE: need to figure out what the actual input/output of this should be.
+
+## data array is one main object; how to simplyfy the results of phenotyping??
+
+layout(matrix(1))
+barplot(summary(PCA)$importance[2,1:maxPC], main = "PC Loadings")
+abline(h = .05, col = "red")
+abline(h = .01, col = "dark red")
+pairs(PCA$x[,1:maxPC])
+
+layout(matrix(1))
+plot(PCA$x[,1:2])
+
+layout(matrix(1))
+plot(hcl)
+
+layout(matrix(1:2, ncol = 2))
+mm_ScreePlot(PCA$x[,1:maxPC])
+mm_SilPlot(PCA$x[,1:maxPC])
+layout(matrix(1))

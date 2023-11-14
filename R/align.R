@@ -4,58 +4,58 @@
 #' Construct a ragged array (containing missing data) of a specified length (up/down sampling individuals to fit).
 #'
 #' @name mm_ArrayData
-#' @param ObsIDs A vector that contains indiviaul IDs repeated for muliple days of collection.
-#' @param ObsDays A vector that contains information on time, IE Day 1, Day 2, Day 3. Note: this vector should include integers, continuous data might produce unintended results.
-#' @param ObsValue A vector containing the variable sampled.
-#' @param ObsMid A vector containng the midpoint day for each individual. Note: ObsMid must have the same number of observations as unique Individuals.
-#' @param StartDay Default is starting at ObsDay 1, can specify other values to subsample.
-#' @param EndDay If NULL (default), the highest ObsDay is used for each individual.
-#' @param ScaleTo Integer. Number of days to up/down sample observations to using \code{\link{mm_GetInterval}}.
-#' @param ScaleToMid If NULL (default) 0 will be centered using mm_interval.
+#' @param IDs A vector that contains indiviaul IDs repeated for muliple days of collection.
+#' @param Days A vector that contains information on time, IE Day 1, Day 2, Day 3. Note: this vector should include integers, continuous data might produce unintended results.
+#' @param Value A vector containing the variable sampled.
+#' @param Mid A vector containng the midpoint day for each individual. Note: Mid must have the same number of ervations as unique Individuals.
+#' @param StartDay Default is starting at Day 1, can specify other values to subsample.
+#' @param EndDay If NULL (default), the highest Day is used for each individual.
+#' @param avgLength Integer. Number of days to up/down sample ervations to using \code{\link{mm_GetInterval}}.
+#' @param avgMid If NULL (default) 0 will be centered using mm_interval.
 #'
 #' @return Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
 #' @export
 #'
 mm_ArrayData <-
-  function(ObsIDs,
-           ObsDays,
-           ObsValue,
-           ObsMid,
+  function(IDs,
+           Days,
+           Value,
+           Mid,
            StartDay = 1,
            EndDay = NULL,
-           ScaleTo,
-           ScaleToMid = NULL) {
+           avgLength,
+           avgMid = NULL) {
 
-    ObsIDs <- as.factor(ObsIDs)
-    IDlevs <- levels(ObsIDs)
+    IDs <- as.factor(IDs)
+    IDlevs <- levels(IDs)
 
-    if (length(ObsMid) != length(IDlevs)) {
-      stop("length of 'ObsMid' not equal to number of individuals")
+    if (length(Mid) != length(IDlevs)) {
+      stop("length of 'Mid' not equal to number of individuals")
     }
     if (!all(
-      length(ObsDays) == length(ObsValue) |
-      length(ObsDays) == length(ObsIDs) |
-      length(ObsValue == length(ObsIDs))
+      length(Days) == length(Value) |
+      length(Days) == length(IDs) |
+      length(Value == length(IDs))
     )) {
       stop("length of observations not equal")
     }
 
-    aDat <- array(dim = c(ScaleTo, 2, length(IDlevs)))
+    aDat <- array(dim = c(avgLength, 2, length(IDlevs)))
     dimnames(aDat)[[3]] <- IDlevs
-    mshpx <- mm_GetInterval(days = ScaleTo, day0 = ScaleToMid)
+    mshpx <- mm_GetInterval(days = avgLength, day0 = avgMid)
 
-    dat1 <- cbind(ObsIDs, ObsDays, ObsValue)
+    dat1 <- cbind(IDs, Days, Value)
 
     for (i in 1:length(IDlevs)) {
-      ## ID, ObsDay, ObsVal
-      ss <- dat1[ObsIDs == IDlevs[i], ]
+      ## ID, Day, Val
+      ss <- dat1[IDs == IDlevs[i], ]
       if (is.null(EndDay)) {
         maxi <- max(ss[, 2], na.rm = T) ## max day
       } else {
         maxi <- EndDay
       }
       seq1 <- StartDay:maxi
-      anchi <- ObsMid[i]
+      anchi <- Mid[i]
 
       mati <- cbind(seq1, rep(NA, length(seq1)))
 
@@ -63,6 +63,7 @@ mm_ArrayData <-
       mati[seq1 %in% ss[, 2], 2] <- ss[, 3]
 
       ## center values based on anchor day
+      ## IE align by day of ovluation (with ovulation being the midpoint)
       seq2 <- seq1 - anchi
       mati[, 1] <- seq2
 
@@ -70,14 +71,14 @@ mm_ArrayData <-
       cent <- mati[seq2 == 0, ]
       uh <- mati[seq2 > 0, ]
 
-      ## scale fractional days
+      ## scaled  days
       lh[, 1] <- lh[, 1] / length(lh[, 1])
       uh[, 1] <- uh[, 1] / length(uh[, 1])
 
       mat2 <- rbind(lh, cent, uh)
 
-      fill <- matrix(nrow = ScaleTo, ncol = 2)
-      for (j in 1:ScaleTo) {
+      fill <- matrix(nrow = avgLength, ncol = 2)
+      for (j in 1:avgLength) {
         val <- which.min(abs(mat2[, 1] - mshpx[j]))
         fill[j, 1] <- mshpx[j]
         fill[j, 2] <- mat2[val, 2]
@@ -128,14 +129,21 @@ mm_GeomScale <- function(x){
 #'
 #' Fill in a ragged away by nearest neighbor imputation
 #' @name mm_FillMissing
-#' @param A A ragged array, presumably constructed with \code{\link{mm_ArrayData}}.
+#' @param A A ragged array (IE, contains missing cells), presumably constructed with \code{\link{mm_ArrayData}}.
 #' @param knn Number of nearest neighbors to draw on for imputation (default = 3).
-#' @param scale Type of scaling to implement (or not). Must be one of "none", "MinMax", "Geom"
+#' @param scale Type of scaling to implement (or not). Must be one of "none", "MinMax", "Geom", "log10", "logE", "zscore".
 #'
 #' @export
 #'
 
-mm_FillMissing <- function(A, knn = 3, scale = c("none", "MinMax", "Geom")){
+mm_FillMissing <- function(A,
+                           knn = 3,
+                           scale = c("none: impute missing based on raw values",
+                                     "MinMax: impute missing after applying Min-Max Scaling",
+                                     "Geom: impute missing after scaling by geometric mean",
+                                     "log10: impute missing after applying log-base 10 transformation",
+                                     "logE: impute missing after applying natural-log tranformation",
+                                     "zscore: impute missing after scaling by individual z-score")){
 
   n <- dim(A)[[3]]
   if (is.null(dimnames(A)[[3]])){
@@ -164,15 +172,44 @@ mm_FillMissing <- function(A, knn = 3, scale = c("none", "MinMax", "Geom")){
   }
 
 
+  ## It should be possible to automate this. perhaps with do.call??
+  ## logic for this section should actually just be a bunch of standalone if calls to modift intA[,2,i]
   if(scale == "MinMax"){
     for (i in 1:n){
       intA[,2,i] <- mm_MinMaxScale(intA[,2,i])
     }
-  } else if(scale == "Geom"){
+  }
+
+  if(scale == "Geom"){
     for (i in 1:n){
       intA[,2,i] <- mm_GeomScale(intA[,2,i])
     }
   }
+
+  if(scale == "log10"){
+    for (i in 1:n){
+      ## figure out log10 tranformation
+      # intA[,2,i] <- mm_GeomScale(intA[,2,i])
+    }
+  }
+
+
+  if(scale == "logE"){
+    for (i in 1:n){
+      ## figure out natural log tranformation
+      # intA[,2,i] <- mm_GeomScale(intA[,2,i])
+    }
+  }
+
+
+  if(scale == "zscore"){
+    for (i in 1:n){
+      ## figure out z scores
+      # intA[,2,i] <- mm_GeomScale(intA[,2,i])
+    }
+  }
+
+
 
   mshp <- apply(intA, c(1,2), mean)
   outliers <- data.frame("ID" = dimnames(intA)[[3]], "nmis" = numeric(n), "error" = numeric(n))

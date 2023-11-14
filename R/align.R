@@ -5,89 +5,141 @@
 #'
 #' @name mm_ArrayData
 #' @param IDs A vector that contains indiviaul IDs repeated for muliple days of collection.
-#' @param Days A vector that contains information on time, IE Day 1, Day 2, Day 3. Note: this vector should include integers, continuous data might produce unintended results.
-#' @param Value A vector containing the variable sampled.
-#' @param Mid A vector containng the midpoint day for each individual. Note: Mid must have the same number of ervations as unique Individuals.
-#' @param StartDay Default is starting at Day 1, can specify other values to subsample.
-#' @param EndDay If NULL (default), the highest Day is used for each individual.
-#' @param avgLength Integer. Number of days to up/down sample ervations to using \code{\link{mm_GetInterval}}.
-#' @param avgMid If NULL (default) 0 will be centered using mm_interval.
+#' @param DAYS A vector that contains information on time, IE Day 1, Day 2, Day 3. Note: this vector should include integers, continuous data might produce unintended results.
+#' @param VALUE A vector containing the variable sampled.
+#' @param MID A vector of midpoints to center each individuals profile. These should be unique to each individual and repeated for each observation of DAYS, VALUE, and IDs.
+#' @param avgLENGTH Integer. Number of days to up/down sample observations to using \code{\link{mm_GetInterval}}.
+#' @param avgMID If NULL (default) 0 will be centered using mm_interval.
 #'
 #' @return Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
 #' @export
 #'
-mm_ArrayData <-
+mm_ArrayData2 <-
   function(IDs,
-           Days,
-           Value,
-           Mid,
-           StartDay = 1,
-           EndDay = NULL,
-           avgLength,
-           avgMid = NULL) {
+           DAYS,
+           VALUE,
+           MID=NULL,
+           avgLENGTH,
+           avgMID = NULL) {
 
     IDs <- as.factor(IDs)
     IDlevs <- levels(IDs)
 
-    if (length(Mid) != length(IDlevs)) {
-      stop("length of 'Mid' not equal to number of individuals")
-    }
     if (!all(
-      length(Days) == length(Value) |
-      length(Days) == length(IDs) |
-      length(Value == length(IDs))
+      length(DAYS) == length(VALUE) |
+      length(DAYS) == length(IDs) |
+      length(VALUE == length(IDs))
+
     )) {
       stop("length of observations not equal")
     }
 
-    aDat <- array(dim = c(avgLength, 2, length(IDlevs)))
-    dimnames(aDat)[[3]] <- IDlevs
-    mshpx <- mm_GetInterval(days = avgLength, day0 = avgMid)
 
-    dat1 <- cbind(IDs, Days, Value)
+
+    aDat <- array(dim = c(avgLENGTH, 2, length(IDlevs)))
+    dimnames(aDat)[[3]] <- IDlevs
+
+    if(is.null(MID)){
+      ## range will be 0 to 1
+      mshpx <- seq(from = 0, to = 1, length.out = avgLENGTH)
+    } else {
+      ## range will be -1 to 1 with 0 at avgMID
+      mshpx <- mm_GetInterval(days = avgLENGTH, day0 = avgMID)
+    }
+
+
+    dat1 <- data.frame(IDs, DAYS, VALUE, MID)
 
     for (i in 1:length(IDlevs)) {
       ## ID, Day, Val
       ss <- dat1[IDs == IDlevs[i], ]
-      if (is.null(EndDay)) {
-        maxi <- max(ss[, 2], na.rm = T) ## max day
+      ss_mid <- MID
+
+      ## scale Y
+      mms_y <- mm_MinMaxScale(ss$VALUE)
+
+      ## scale x
+
+      if(is.null(MID)){
+        ## don't center the X values
+        mms_x <- mm_MinMaxScale(ss$DAYS)
       } else {
-        maxi <- EndDay
+
+        x_centered <- ss$DAYS - ss$MID
+
+        neg_x <- x_centered[x_centered < 0]
+        pos_x <- x_centered[x_centered > 0]
+
+        scl_neg_x <- mm_MinMaxScale(abs(neg_x))*-1
+        scl_pos_x <- mm_MinMaxScale(pos_x)
+
+        scl_x <- as.numeric(c(scl_neg_x, 0, scl_pos_x))
+        mms_x <- scl_x
       }
-      seq1 <- StartDay:maxi
-      anchi <- Mid[i]
 
-      mati <- cbind(seq1, rep(NA, length(seq1)))
+      #
+      #
+      # maxi <- max(ss[, 2], na.rm = T) ## max day
+      #
+      # seq1 <- 1:maxi
+      # anchi <- MID[i]
+      #
+      # mati <- cbind(seq1, rep(NA, length(seq1)))
+      #
+      # ## fill in matrix for days with values present
+      # mati[seq1 %in% ss[, 2], 2] <- ss[, 3]
+      #
+      # ## center values based on anchor day
+      # ## IE align by day of ovluation (with ovulation being the midpoint)
+      # seq2 <- seq1 - anchi
+      # mati[, 1] <- seq2
+      #
+      # lh <- mati[seq2 < 0, ]
+      # cent <- mati[seq2 == 0, ]
+      # uh <- mati[seq2 > 0, ]
+      #
+      # ## scaled  days
+      # lh[, 1] <- lh[, 1] / length(lh[, 1])
+      # uh[, 1] <- uh[, 1] / length(uh[, 1])
 
-      ## fill in matrix for days with values present
-      mati[seq1 %in% ss[, 2], 2] <- ss[, 3]
+      mat2 <- cbind(mms_x, mms_y)
 
-      ## center values based on anchor day
-      ## IE align by day of ovluation (with ovulation being the midpoint)
-      seq2 <- seq1 - anchi
-      mati[, 1] <- seq2
+      # mat2 <- rbind(lh, cent, uh)
 
-      lh <- mati[seq2 < 0, ]
-      cent <- mati[seq2 == 0, ]
-      uh <- mati[seq2 > 0, ]
+      fill <- matrix(nrow = avgLENGTH, ncol = 2)
+      for (j in 1:avgLENGTH) {
 
-      ## scaled  days
-      lh[, 1] <- lh[, 1] / length(lh[, 1])
-      uh[, 1] <- uh[, 1] / length(uh[, 1])
+        threshold <- round((1/avgLENGTH)/2,3)
+        sel_min <- mshpx[j]-threshold
+        sel_max <- mshpx[j]+threshold
 
-      mat2 <- rbind(lh, cent, uh)
+        sel_vals <- mat2[mat2[,1] > sel_min & mat2[,1] < sel_max,1]
 
-      fill <- matrix(nrow = avgLength, ncol = 2)
-      for (j in 1:avgLength) {
-        val <- which.min(abs(mat2[, 1] - mshpx[j]))
-        fill[j, 1] <- mshpx[j]
-        fill[j, 2] <- mat2[val, 2]
+        if(!length(sel_vals)==0){
+          ## handle multiple values
+          sel_val <- sel_vals[which.min(abs(sel_vals - mshpx[j]))]
+          fill[j, 2] <- mat2[sel_val,2]
+
+        } else {
+          fill[j, 2] <- NA_integer_
+        }
+
+        fill[j, 1] <- mshpx[j] ## this doesn't actually change
+
       }
       aDat[, , i] <- fill
     }
     return(aDat)
   }
 
+
+test <- mm_ArrayData2(new_data$ID, new_data$CYCLEDAY, new_data$E1G, new_data$MIDPOINT, avgLENGTH = 28, avgMID = 16)
+
+range(test, na.rm = T)
+
+range(test[,1,], na.rm = T)
+
+range(test[,2,], na.rm = T)
 
 #' Min-Max Scaling
 #'
@@ -227,7 +279,7 @@ mm_FillMissing <- function(A,
 #' Create equallly spaced intervals.
 #'
 #'
-#' Create a sequence from -1:1 of specified length. Midpoint (day0) can be
+#' Create a sequence from -1:1 of specified length. MIDpoint (day0) can be
 #' @name mm_GetInterval
 #' @param days The number of days(divisions) fit between -1 and 1 (inclusive)
 #' @param day0 If NULL (default), the median integer will be calculated. This produces symmetrical ranges when days = odd number. Can be specified for asymmetric ranges.

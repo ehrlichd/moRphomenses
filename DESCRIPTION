@@ -8,7 +8,7 @@ Authors@R:
                     email = "dan.ehrlich.e@gmail.com")
 Description: Geometric Morphometric based methods to study the shape/phenotype of hormone concentrations across the menstrual cycle.
 License: GPL (>= 3.0)
-Imports: dendextend, cluster
+Imports: dendextend, cluster, geomorph
 URL: <https://github.com/ehrlichd/moRphomenses>
 Encoding: UTF-8
 LazyData: true

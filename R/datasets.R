@@ -10,9 +10,9 @@
 #'   \item{CYCLEDAY}{Integer day of cycle. Generally runs from 1 ... 28)}
 #'   \item{MIDPOINT}{Single value for each individual, repeated along each CYCLEDAY. In this sample, day of ovulation.)}
 #'   \item{E1G}{Daily measure of hormone, in nanograms per mililiter)}
-#'   ...
+#'
 #' }
 #'
-
-
+#'
+NULL
 

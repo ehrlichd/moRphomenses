@@ -4,12 +4,14 @@
 #' Construct a ragged array (containing missing data) of a specified length (up/down sampling individuals to fit).
 #'
 #' @name mm_ArrayData
-#' @param IDs A vector that contains indiviaul IDs repeated for muliple days of collection.
+#' @param IDs A vector that contains individual IDs repeated for multiple days of collection.
 #' @param DAYS A vector that contains information on time, IE Day 1, Day 2, Day 3. Note: this vector should include integers, continuous data might produce unintended results.
 #' @param VALUE A vector containing the variable sampled.
-#' @param MID A vector of midpoints to center each individuals profile. These should be unique to each individual and repeated for each observation of DAYS, VALUE, and IDs.
-#' @param avgLENGTH Integer. Number of days to up/down sample observations to using \code{\link{mm_GetInterval}}.
-#' @param avgMID If NULL (default) 0 will be centered using mm_interval.
+#' @param MID Am optional vector of midpoints to center each individuals profile. These should be unique to each individual and repeated for each observation of DAYS, VALUE, and IDs. If NULL (defualt), data will not be centered on any day.
+#' @param avgLENGTH Integer. Number of days to up/down sample observations to using \code{\link{mm_get_interval}}.
+#' @param avgMID If NULL (default) data will not be centered and will range from 0 to 1. If specified, data will be centered on 0 ranging from -1 to 1.
+#' @param transformation Which (if any) data transformation to apply. Our reccomendation is minmax, but Geometric mean, Zscore, natural log and log10 transformations are available, if desired.
+#' @param impute_missing Integer. If not null, number of nearest-neighbors to use to impute missing data (Default = 3).
 #'
 #' @return Returns a 3D array of data to be analyzed with individuals in the 3rd dimension.
 #' @export
@@ -20,7 +22,9 @@ mm_ArrayData <-
            VALUE,
            MID=NULL,
            avgLENGTH,
-           avgMID = NULL) {
+           avgMID = NULL,
+           transformation = c("minmax", "geom", "zscore", "log", "log10"),
+           impute_missing = 3){
 
     IDs <- as.factor(IDs)
     IDlevs <- levels(IDs)
@@ -37,7 +41,9 @@ mm_ArrayData <-
 
 
     aDat <- array(dim = c(avgLENGTH, 2, length(IDlevs)))
+    unsDat <- array(dim = c(avgLENGTH, 2, length(IDlevs)))
     dimnames(aDat)[[3]] <- IDlevs
+    dimnames(unsDat)[[3]] <- IDlevs
 
     if(is.null(MID)){
       ## range will be 0 to 1
@@ -45,7 +51,7 @@ mm_ArrayData <-
       dat1 <- data.frame(IDs, DAYS, VALUE)
     } else {
       ## range will be -1 to 1 with 0 at avgMID
-      mshpx <- mm_GetInterval(days = avgLENGTH, day0 = avgMID)
+      mshpx <- mm_get_interval(days = avgLENGTH, day0 = avgMID)
       dat1 <- data.frame(IDs, DAYS, VALUE, MID)
     }
 
@@ -55,99 +61,177 @@ mm_ArrayData <-
     for (i in 1:length(IDlevs)) {
       ## ID, Day, Val
       ss <- dat1[IDs == IDlevs[i], ]
+
+
+      if(!is.null(MID)){
       ss_mid <- MID
 
-      ## scale Y
-      mms_y <- mm_MinMaxScale(ss$VALUE)
+      x_centered <- ss$DAYS - ss$MID
 
-      ## scale x
+      neg_x <- x_centered[x_centered <= 0]
+      pos_x <- x_centered[x_centered > 0] ## avoid double counting day0
 
-      if(is.null(MID)){
-        ## don't center the X values
-        mms_x <- mm_MinMaxScale(ss$DAYS)
-      } else {
+      }
 
-        x_centered <- ss$DAYS - ss$MID
+      sizeDat <- data.frame(
+        "size_x" = numeric(length=length(IDlevs)),
+        "size_y" = numeric(length=length(IDlevs))
+      )
 
-        neg_x <- x_centered[x_centered <= 0]
-        pos_x <- x_centered[x_centered >= 0]
 
-        scl_neg_x <- mm_MinMaxScale(abs(neg_x))*-1
-        scl_pos_x <- mm_MinMaxScale(pos_x)
 
-        ## drop extra 0 from one
-        scl_pos_x <- scl_pos_x[-1]
 
-        ## this string now includes a 0 in scl_neg_x
 
-        scl_x <- as.numeric(c(scl_neg_x, scl_pos_x))
-        mms_x <- scl_x
+      ## if no scaling
+
+      mms_y <- ss$VALUE
+      uns_y <- ss$VALUE
+      mms_x <- ss$DAYS
+      size_x <- length(ss$DAYS)
+      sizy_y <- max(ss$VALUE)
+
+      ## apply scaling
+
+      if(transformation=="minmax"){
+        mms_y <- mm_transf_minmax(ss$VALUE)
+        size_y <- max(ss$Value)
+
+        if(is.null(MID)){
+          mms_x <- ss$DAYS
+        } else {
+          scl_neg_x <- mm_transf_minmax(abs(neg_x))*-1
+          scl_pos_x <- mm_transf_minmax(pos_x)
+
+          mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
+        }
+      }
+
+      if(transformation=="geom"){
+        mms_y <- mm_transf_geom(ss$VALUE)
+        size_y <- (prod(ss$VALUE)^(1/length(ss$VALUE)))
+        if(is.null(MID)){
+          mms_x <- ss$DAYS
+        } else {
+          scl_neg_x <- mm_transf_geom(abs(neg_x))*-1
+          scl_pos_x <- mm_transf_geom(pos_x)
+
+          mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
+        }
+      }
+
+      if(transformation=="zscore"){
+        mms_y <- mm_transf_zscore(ss$VALUE)
+        size_y <- mean(ss$VALUE)/sd(ss$VALUE)
+        if(is.null(MID)){
+          mms_x <- ss$DAYS
+        } else {
+          scl_neg_x <- mm_transf_zscore(abs(neg_x))*-1
+          scl_pos_x <- mm_transf_zscore(pos_x)
+
+          mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
+        }
+      }
+
+      if(transformation=="log"){
+        mms_y <- mm_transf_log(ss$VALUE)
+        size_y <- max(log(ss$VALUE))
+        if(is.null(MID)){
+          mms_x <- ss$DAYS
+        } else {
+          scl_neg_x <- mm_transf_log(abs(neg_x))*-1
+          scl_pos_x <- mm_transf_log(pos_x)
+
+          mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
+        }
+      }
+
+      if(transformation=="log10"){
+        mms_y <- mm_transf_log10(ss$VALUE)
+        size_y <- max(log10(ss$VALUE))
+        if(is.null(MID)){
+          mms_x <- ss$DAYS
+        } else {
+          scl_neg_x <- mm_transf_log10(abs(neg_x))*-1
+          scl_pos_x <- mm_transf_log10(pos_x)
+
+          mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
+        }
       }
 
 
-      mat2 <- cbind(mms_x, mms_y)
 
+      ## slide x
 
-      fill <- matrix(nrow = avgLENGTH, ncol = 2)
+      shape_mat <- cbind(mms_x, mms_y)
+      uns_mat <- cbind(mms_x, uns_y)
+
+      shape_fill <- matrix(nrow = avgLENGTH, ncol = 2)
+      uns_fill <- matrix(nrow = avgLENGTH, ncol = 2)
+
       for (j in 1:avgLENGTH) {
 
         threshold <- round((1/avgLENGTH)/2,3)
         sel_min <- mshpx[j]-threshold
         sel_max <- mshpx[j]+threshold
 
-        sel_vals <- mat2[mat2[,1] > sel_min & mat2[,1] < sel_max,1]
+        sel_vals <- shape_mat[shape_mat[,1] > sel_min & shape_mat[,1] < sel_max,1]
+
 
         if(!length(sel_vals)==0){
           ## handle multiple values
           sel_val <- sel_vals[which.min(abs(sel_vals - mshpx[j]))]
-          fill[j, 2] <- mat2[mat2[,1]==sel_val,2]
+          shape_fill[j, 2] <- shape_mat[shape_mat[,1]==sel_val,2]
+          uns_fill[j,2] <- uns_mat[shape_mat[,1]==sel_val,2]
 
         } else {
-          fill[j, 2] <- NA_integer_
+          shape_fill[j, 2] <- NA_complex_
+          uns_fill[j,2] <- NA_complex_
         }
 
-        fill[j, 1] <- mshpx[j] ## this doesn't actually change
+        shape_fill[j, 1] <- mshpx[j]
+        uns_fill[j,1] <- mshpx[j]
 
       }
-      aDat[, , i] <- fill
+
+      aDat[, , i] <- shape_fill
+      unsDat[,,i] <- uns_fill
+      sizeDat[i,] <- c(size_x, size_y)
+
+      # if(!is.null(MID)){
+      #   left_scale <- ss_MID[1]
+      #   right_scale <- size_x-ss_MID[1]
+      #   to_fill_left <- shape_fill[shape_fill[,1] < 0,1] * left_scale
+      #   unsDat[1:length(to_fill_left),1,i] <- to_fill_left
+      #   unsDat[to_fill_left:dim(unsDat)[[1]],1,i] <- shape_fill[shape_fill[,1] < 0,1] * left_scale
+      # } else {
+      #   unsDat[,1,i] <- shape_fill[,1]*size_x
+      # }
+      # unsDat[,2,i] <- shape_fill[,2]*size_y
+      }
+
+      out <- list(
+        "Shape_data" = aDat,
+        "Size_data" = sizeDat,
+        "Unscaled_y" = unsDat,
+        "scaleType" = transformation
+      )
+
+
+    if(!is.null(impute_missing)){
+      out$shape_data_wNA <- aDat
+      knn_dat <- mm_FillMissing(aDat, knn=impute_missing)
+      out$Shape_data <- knn_dat$dat
+
+
+      out$knn_info <- knn_dat$info
     }
-    return(aDat)
+
+
+
+
+    return(out)
   }
 
-
-
-
-#' Min-Max Scaling
-#'
-#' Scale a vector from 0,1 based on its minimum and maximum values.
-#'
-#' @param x A Numeric vector to be scaled. Missing values are allowed and ignored.
-#'
-#' @return Returns a scaled vector
-#'
-#' @examples
-#' mm_MinMaxScale(1:10)
-#' @export
-#'
-
-mm_MinMaxScale <- function(x){
-  return((x- min(x, na.rm = T)) /(max(x, na.rm = T)-min(x, na.rm = T)))
-}
-
-#' Geometric Scaling
-#'
-#' Calculate the geometric mean of a vector and scale all values by it.
-#'
-#' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
-#'
-#' @examples
-#' mm_GeomScale(1:10)
-#' @export
-#'
-#
-mm_GeomScale <- function(x){
-  return(x/(prod(x)^(1/length(x))))
-}
 
 
 
@@ -159,23 +243,16 @@ mm_GeomScale <- function(x){
 #' @name mm_FillMissing
 #' @param A A ragged array (IE, contains missing cells), presumably constructed with \code{\link{mm_ArrayData}}.
 #' @param knn Number of nearest neighbors to draw on for imputation (default = 3).
-#' @param scale Type of scaling to implement (or not). Must be one of "none", "MinMax", "Geom", "log10", "logE", "zscore".
 #'
 #' @export
 #'
 
 mm_FillMissing <- function(A,
-                           knn = 3,
-                           scale = c("none: impute missing based on raw values",
-                                     "MinMax: impute missing after applying Min-Max Scaling",
-                                     "Geom: impute missing after scaling by geometric mean",
-                                     "log10: impute missing after applying log-base 10 transformation",
-                                     "logE: impute missing after applying natural-log tranformation",
-                                     "zscore: impute missing after scaling by individual z-score")){
+                           knn = 3){
 
   n <- dim(A)[[3]]
   if (is.null(dimnames(A)[[3]])){
-    dimnames(A)[[3]] <- paste("Spec",1:n, sep = "")
+    dimnames(A)[[3]] <- paste("Obs",1:n, sep = "")
   }
 
   missing <- apply(A, 3, anyNA)
@@ -200,44 +277,6 @@ mm_FillMissing <- function(A,
   }
 
 
-  ## It should be possible to automate this. perhaps with do.call??
-  ## logic for this section should actually just be a bunch of standalone if calls to modift intA[,2,i]
-  if(scale == "MinMax"){
-    for (i in 1:n){
-      intA[,2,i] <- mm_MinMaxScale(intA[,2,i])
-    }
-  }
-
-  if(scale == "Geom"){
-    for (i in 1:n){
-      intA[,2,i] <- mm_GeomScale(intA[,2,i])
-    }
-  }
-
-  if(scale == "log10"){
-    for (i in 1:n){
-      ## figure out log10 tranformation
-      # intA[,2,i] <- mm_GeomScale(intA[,2,i])
-    }
-  }
-
-
-  if(scale == "logE"){
-    for (i in 1:n){
-      ## figure out natural log tranformation
-      # intA[,2,i] <- mm_GeomScale(intA[,2,i])
-    }
-  }
-
-
-  if(scale == "zscore"){
-    for (i in 1:n){
-      ## figure out z scores
-      # intA[,2,i] <- mm_GeomScale(intA[,2,i])
-    }
-  }
-
-
 
   mshp <- apply(intA, c(1,2), mean)
   outliers <- data.frame("ID" = dimnames(intA)[[3]], "nmis" = numeric(n), "error" = numeric(n))
@@ -246,29 +285,34 @@ mm_FillMissing <- function(A,
     outliers$nmis[[i]] <- sum(is.na(A[,2,i]))
     outliers$error[[i]] <- sum((intA[,2,i] - mshp[,2])^2)
   }
-  out <- list("dat" = intA, "info" = outliers, "grandM" = mshp,  "scaleType" = scale)
+  out <- list("dat" = intA, "info" = outliers, "grandM" = mshp)
 
   return(out)
 }
+
+
+
+
+
 
 
 #' Create equallly spaced intervals.
 #'
 #'
 #' Create a sequence from -1:1 of specified length. MIDpoint (day0) can be
-#' @name mm_GetInterval
+#' @name mm_get_interval
 #' @param days The number of days(divisions) fit between -1 and 1 (inclusive)
 #' @param day0 If NULL (default), the median integer will be calculated. This produces symmetrical ranges when days = odd number. Can be specified for asymmetric ranges.
 #'
 #' @examples
-#' mm_GetInterval(15) ## Symmetrical sequence from -1 to 1 with 0 in the middle.
-#' mm_GetInterval(15, day0 = 8) ## The same sequence, explicitly specifying the midpoint
+#' mm_get_interval(15) ## Symmetrical sequence from -1 to 1 with 0 in the middle.
+#' mm_get_interval(15, day0 = 8) ## The same sequence, explicitly specifying the midpoint
 #'
-#' mm_GetInterval(15, day0 = 3) ## 15 divisions with an asymmetric distribution.
+#' mm_get_interval(15, day0 = 3) ## 15 divisions with an asymmetric distribution.
 #'
 #' @export
 #'
-mm_GetInterval <- function(days, day0 = NULL){
+mm_get_interval <- function(days, day0 = NULL){
   seq1 <- 1:days
   if (is.null(day0)){
     mid <- as.integer(median(seq1))
@@ -287,6 +331,94 @@ mm_GetInterval <- function(days, day0 = NULL){
 
   seq3 <- c(lh2, 0, uh2)
   return(seq3)
+}
+
+
+
+
+## scaling functions #####
+
+
+
+
+#' Min-Max Scaling
+#'
+#' Scale a vector from 0,1 based on its minimum and maximum values.
+#'
+#' @param x A Numeric vector to be scaled. Missing values are allowed and ignored.
+#'
+#' @return Returns a scaled vector
+#'
+#' @examples
+#' mm_transf_minmax(1:10)
+#' @export
+#'
+
+mm_transf_minmax <- function(x){
+  return((x- min(x, na.rm = T)) /(max(x, na.rm = T)-min(x, na.rm = T)))
+}
+
+#' Geometric Scaling
+#'
+#' Calculate the geometric mean of a vector and scale all values by it.
+#'
+#' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
+#'
+#' @examples
+#' mm_transf_geom(1:10)
+#' @export
+#'
+#
+mm_transf_geom <- function(x){
+  return(x/(prod(x)^(1/length(x))))
+}
+
+
+#' Z scores
+#'
+#' Calculate and return z-scores given a numeric vector.
+#'
+#' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
+#'
+#' @examples
+#' mm_transf_zscore(1:10)
+#' @export
+#'
+#
+mm_transf_zscore <- function(x){
+  return(mean(x, na.rm=T)/sd(x, na.rm=T))
+}
+
+
+#' natural log transform
+#'
+#' Transform a vector by the natural log.
+#'
+#' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
+#'
+#' @examples
+#' mm_transf_log(1:10)
+#' @export
+#'
+#
+mm_transf_log <- function(x){
+  return(log(x))
+}
+
+
+#' Common log transform
+#'
+#' Transform a vector by the common log (base 10).
+#'
+#' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
+#'
+#' @examples
+#' mm_transf_log10(1:10)
+#' @export
+#'
+#
+mm_transf_log10 <- function(x){
+  return(log10(x))
 }
 
 

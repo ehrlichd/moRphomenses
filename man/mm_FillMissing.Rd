@@ -4,23 +4,12 @@
 \alias{mm_FillMissing}
 \title{Impute Missing Data}
 \usage{
-mm_FillMissing(
-  A,
-  knn = 3,
-  scale = c("none: impute missing based on raw values",
-    "MinMax: impute missing after applying Min-Max Scaling",
-    "Geom: impute missing after scaling by geometric mean",
-    "log10: impute missing after applying log-base 10 transformation",
-    "logE: impute missing after applying natural-log tranformation",
-    "zscore: impute missing after scaling by individual z-score")
-)
+mm_FillMissing(A, knn = 3)
 }
 \arguments{
 \item{A}{A ragged array (IE, contains missing cells), presumably constructed with \code{\link{mm_ArrayData}}.}
 
 \item{knn}{Number of nearest neighbors to draw on for imputation (default = 3).}
-
-\item{scale}{Type of scaling to implement (or not). Must be one of "none", "MinMax", "Geom", "log10", "logE", "zscore".}
 }
 \description{
 Fill in a ragged away by nearest neighbor imputation

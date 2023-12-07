@@ -9,6 +9,7 @@ mm_Viz_shapespace(
   xPC = 1,
   yPC = 2,
   yr = c(0, 1),
+  cols = NULL,
   title = "",
   png_dir = NULL
 )
@@ -21,6 +22,8 @@ mm_Viz_shapespace(
 \item{yPC}{The PC to be plotted on the y axis.}
 
 \item{yr}{The y-xis range, in the format c(0,1)}
+
+\item{cols}{A vector of colors of length n, for use in scatterplot.}
 
 \item{title}{To be used for the plot}
 

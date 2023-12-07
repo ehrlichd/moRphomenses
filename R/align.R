@@ -45,6 +45,13 @@ mm_ArrayData <-
     dimnames(aDat)[[3]] <- IDlevs
     dimnames(unsDat)[[3]] <- IDlevs
 
+    sizeDat <- data.frame(
+      "size_x" = numeric(length=length(IDlevs)),
+      "size_y" = numeric(length=length(IDlevs))
+    )
+
+
+
     if(is.null(MID)){
       ## range will be 0 to 1
       mshpx <- seq(from = 0, to = 1, length.out = avgLENGTH)
@@ -58,28 +65,30 @@ mm_ArrayData <-
 
 
 
+    ## For each INDIVIDUAL #####
+
     for (i in 1:length(IDlevs)) {
       ## ID, Day, Val
       ss <- dat1[IDs == IDlevs[i], ]
 
+      full_days <- data.frame(
+        "DAYS" = seq(from=1, to = max(ss$DAYS, na.rm = T))
+        )
+
+      full_days2 <- merge(full_days, ss, by = "DAYS", all.x = TRUE)
+
+      ss <- full_days2
+
 
       if(!is.null(MID)){
-      ss_mid <- MID
+      ss_mid <- median(ss$MID,na.rm = T)
 
-      x_centered <- ss$DAYS - ss$MID
+      x_centered <- ss$DAYS - ss_mid
 
-      neg_x <- x_centered[x_centered <= 0]
-      pos_x <- x_centered[x_centered > 0] ## avoid double counting day0
+      neg_x <- x_centered[x_centered <= 0] ## we WANT to include 0 at this step
+      pos_x <- x_centered[x_centered >= 0]
 
       }
-
-      sizeDat <- data.frame(
-        "size_x" = numeric(length=length(IDlevs)),
-        "size_y" = numeric(length=length(IDlevs))
-      )
-
-
-
 
 
       ## if no scaling
@@ -88,19 +97,20 @@ mm_ArrayData <-
       uns_y <- ss$VALUE
       mms_x <- ss$DAYS
       size_x <- length(ss$DAYS)
-      sizy_y <- max(ss$VALUE)
+      size_y <- max(ss$VALUE, na.rm = T)
 
       ## apply scaling
 
       if(transformation=="minmax"){
         mms_y <- mm_transf_minmax(ss$VALUE)
-        size_y <- max(ss$Value)
+        size_y <- max(ss$VALUE, na.rm = T)
 
         if(is.null(MID)){
-          mms_x <- ss$DAYS
+          mms_x <- mm_transf_minmax(ss$DAYS)
         } else {
           scl_neg_x <- mm_transf_minmax(abs(neg_x))*-1
           scl_pos_x <- mm_transf_minmax(pos_x)
+          scl_pos_x <- scl_pos_x[-1] ## drop the duplicate 0
 
           mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
         }
@@ -110,10 +120,12 @@ mm_ArrayData <-
         mms_y <- mm_transf_geom(ss$VALUE)
         size_y <- (prod(ss$VALUE)^(1/length(ss$VALUE)))
         if(is.null(MID)){
-          mms_x <- ss$DAYS
+          mms_x <- mm_transf_geom(ss$DAYS)
         } else {
           scl_neg_x <- mm_transf_geom(abs(neg_x))*-1
           scl_pos_x <- mm_transf_geom(pos_x)
+          scl_pos_x <- scl_pos_x[-1] ## drop the duplicate 0
+
 
           mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
         }
@@ -121,12 +133,14 @@ mm_ArrayData <-
 
       if(transformation=="zscore"){
         mms_y <- mm_transf_zscore(ss$VALUE)
-        size_y <- mean(ss$VALUE)/sd(ss$VALUE)
+        size_y <- mean(mms_y) ## avg Z score??
         if(is.null(MID)){
-          mms_x <- ss$DAYS
+          mms_x <- mm_transf_zscore(ss$DAYS)
         } else {
           scl_neg_x <- mm_transf_zscore(abs(neg_x))*-1
           scl_pos_x <- mm_transf_zscore(pos_x)
+          scl_pos_x <- scl_pos_x[-1] ## drop the duplicate 0
+
 
           mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
         }
@@ -134,12 +148,14 @@ mm_ArrayData <-
 
       if(transformation=="log"){
         mms_y <- mm_transf_log(ss$VALUE)
-        size_y <- max(log(ss$VALUE))
+        size_y <- max(log(ss$VALUE), na.rm=T) ## max log value??
         if(is.null(MID)){
-          mms_x <- ss$DAYS
+          mms_x <- mm_transf_log(ss$DAYS)
         } else {
           scl_neg_x <- mm_transf_log(abs(neg_x))*-1
           scl_pos_x <- mm_transf_log(pos_x)
+          scl_pos_x <- scl_pos_x[-1] ## drop the duplicate 0
+
 
           mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
         }
@@ -147,12 +163,14 @@ mm_ArrayData <-
 
       if(transformation=="log10"){
         mms_y <- mm_transf_log10(ss$VALUE)
-        size_y <- max(log10(ss$VALUE))
+        size_y <- max(log10(ss$VALUE), na.rm=T)
         if(is.null(MID)){
-          mms_x <- ss$DAYS
+          mms_x <- mm_transf_log10(ss$DAYS)
         } else {
           scl_neg_x <- mm_transf_log10(abs(neg_x))*-1
           scl_pos_x <- mm_transf_log10(pos_x)
+          scl_pos_x <- scl_pos_x[-1] ## drop the duplicate 0
+
 
           mms_x <- as.numeric(c(scl_neg_x, scl_pos_x))
         }
@@ -170,7 +188,8 @@ mm_ArrayData <-
 
       for (j in 1:avgLENGTH) {
 
-        threshold <- round((1/avgLENGTH)/2,3)
+        # threshold <- round((1/avgLENGTH),3) ## this seems to be causing problems
+        threshold <- .05 ## previously .036
         sel_min <- mshpx[j]-threshold
         sel_max <- mshpx[j]+threshold
 
@@ -184,8 +203,8 @@ mm_ArrayData <-
           uns_fill[j,2] <- uns_mat[shape_mat[,1]==sel_val,2]
 
         } else {
-          shape_fill[j, 2] <- NA_complex_
-          uns_fill[j,2] <- NA_complex_
+          shape_fill[j, 2] <- NA_real_
+          uns_fill[j,2] <- NA_real_
         }
 
         shape_fill[j, 1] <- mshpx[j]

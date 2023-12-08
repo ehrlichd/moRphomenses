@@ -8,8 +8,8 @@
 A matrix with 2015 obs (rows) and 4 variables (columns).
 \describe{
 
-\item{ID}{Individual id, each integer represents a different individual. Includes leading 0s.}
-\item{CYCLEDAY}{Integer day of cycle. Generally runs from 1 ... 28}
+\item{ID}{Individual id, each integer represents a different individual.}
+\item{CYCLEDAY}{Integer day of cycle. Generally runs from 1 ... (28 on average).}
 \item{MIDPOINT}{Single value for each individual, repeated along each CYCLEDAY. In this sample, day of ovulation.}
 \item{E1G}{Daily measure of hormone, in nanograms per mililiter}
 

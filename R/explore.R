@@ -282,6 +282,8 @@ mm_Phenotype <- function(dat, kgrps, cuttree_h=NULL, cuttree_k=NULL, plot_figs=T
 
   }
 
+  return(out)
+
 
 }
 
@@ -487,6 +489,216 @@ mm_grps_PlotArray <- function(A, grps){
 }
 
 
+
+
+#' Plot Calendar Days
+#'
+
+#' Pretty PCA
+#'
+#' A better PCA plot
+#'
+#' @param PCA Input data either prcomp or mmPCA.
+#' @param xPC The PC to plot on the x axis
+#' @param yPC The PC to plot on the y axis
+#' @param clas_col A character vector of groupings. Each level will be plotted as a different color.
+#' @param legend_cex A scaling factor to be applied specifically to the legend. Set to NULL for scatterplot only.
+#'
+#' @export
+#'
+#'
+#'
+mm_pretty_pca <- function(PCA, xPC=1, yPC=2, clas_col = NULL, legend_cex = .8) {
+
+  out <- list()
+  if (!class(PCA) %in% c("prcomp", "mmPCA")) {
+    stop(paste(deparse(substitute(PCA)), "must be a PCA object"))
+  } else if(class(PCA) %in% "mmPCA"){
+    out$PCA <- PCA$PCA
+  } else {
+    out$PCA <- PCA
+    out$PCA$eigs <- summary(out$shpPCA)$importance[2:3,]
+  }
+
+
+
+  x_PC <- out$PCA$x[, xPC]
+  y_PC <- out$PCA$x[, yPC]
+
+  n_ind <- nrow(out$PCA$x)
+
+  eigs <- out$PCA$eigs
+
+  sub_lbl <- paste(
+    paste0("X: PC ", xPC, "; ", round(eigs[1,xPC],2), "% Variance"),
+    paste0("Y: PC ", yPC, "; ", round(eigs[1,yPC],2), "% Variance"), sep = "\n")
+
+  ## Get some values
+  x_range <- range(x_PC)
+  x_diff <- ceiling(max(abs(x_range)))
+
+  # x_diff <- diff(x_range)/2
+
+  y_range <- range(y_PC)
+  y_diff <- ceiling(max(abs(y_range)))
+  if(y_diff > x_diff){
+    diff <- y_diff
+  } else {
+    diff <- x_diff
+  }
+  mean_x <- round(mean(x_PC),2)*100
+  mean_y <- round(mean(y_PC),2)*100
+
+  seq <- seq(from = mean_x - diff,
+             to = mean_x + diff,
+             length.out = 5)
+
+  xax <- data.frame("x" = seq,
+                    "y" = rep(0, 5),
+                    "labs" = seq)
+
+  yax <- data.frame("x" = rep(0, 5),
+                    "y" = seq,
+                    "labs" = seq)
+
+  if (is.null(clas_col)) {
+    clas_col <- 1
+
+    lbl <- "tmp"
+
+  } else {
+    lbl <- deparse(substitute(clas_col))
+
+  }
+
+  if (class(clas_col) != "factor") {
+    clas_col <- factor(clas_col)
+  }
+
+
+  if (length(levels(clas_col)) == 1) {
+
+    m_lbl <- paste("PCA of", deparse(substitute(PCA)))
+
+    all_cols <- data.frame("class" = rep(clas_col, n_ind),
+                           "col" = rep(hsv(1, 0, .5, .5), n_ind))
+    m_pts <- c(mean_x, mean_y)
+    m_cols <- "black"
+    ggrps <- "No classifier selected"
+    cc <- "grey"
+  } else {
+
+
+    m_lbl <- paste(paste("PCA of", deparse(substitute(PCA))), paste("Classified by", lbl, sep = "\n"), sep = "\n")
+
+    ggrps <- levels(clas_col)
+    all_cols <- data.frame("class" = clas_col,
+                           "col" = character(n_ind))
+    cc <- rainbow(length(ggrps),
+                  s = .8, v = .6, alpha = .5)
+    m_cols <- rainbow(length(ggrps),
+                      s = .6, v = .8,
+                      alpha = 1)
+    m_pts <- matrix(nrow = length(ggrps), ncol = 2)
+    for (i in seq_along(ggrps)) {
+      all_cols$col[as.integer(all_cols$class) == i] <- cc[i]
+      m_pts[i, 1] <- mean(x_PC[as.integer(all_cols$class) == i])
+      m_pts[i, 2] <- mean(y_PC[as.integer(all_cols$class) == i])
+    }
+
+
+  }
+  par(mar = c(.5,.5,.5,.5))
+
+  if(!is.null(legend_cex)){
+
+  ## Make an empty column and plot legend
+  layout(matrix(c(1,2,2), ncol = 3))
+  plot(1:5,
+       main = "",
+       xaxt = "n",
+       yaxt = "n",
+       bty = "n",
+       xlab = "",
+       ylab = "",
+       type = "n"
+  )
+  legend("center", legend = ggrps, pch = 22, pt.bg = cc, cex = legend_cex)
+
+  text(1,5, labels = m_lbl, adj = c(0,1))
+  text(1,1.2, labels = sub_lbl, adj = c(0,1), cex = .8)
+
+  }
+
+
+  ## plot individuals without box or annotation
+
+  plot(
+    x_PC,
+    y_PC,
+    pch = 16,
+    cex = 2,
+    col = all_cols$col,
+    main = "",
+    xaxt = "n",
+    yaxt = "n",
+    bty = "n",
+    xlab = "",
+    ylab = "",
+    xlim = range(seq),
+    ylim = range(seq)
+  )
+
+
+  ## plot Axes and labels
+  points(
+    xax,
+    type = "l",
+    lty = 2,
+    lwd = 1,
+    col = "black"
+  )
+  points(
+    yax,
+    type = "l",
+    lty = 2,
+    lwd = 1,
+    col = "black"
+  )
+  text(xax,
+       labels = xax$labs,
+       cex = .8,
+       adj = c(0, 1))
+  text(yax,
+       labels = yax$labs,
+       cex = .8,
+       adj = c(0, 1))
+
+  ## plot means
+
+  if (length(levels(clas_col)) == 1) {
+    points(m_pts[1],
+           m_pts[2],
+           pch = 23,
+           bg = m_cols,
+           cex = 1.5)
+
+  } else {
+    points(m_pts,
+           pch = 23,
+           bg = m_cols,
+           cex = 1.5)
+
+  }
+
+
+  layout(matrix(1))
+}
+
+
+
+
+
 #' Visualize PC axes
 #'
 #' Plot a scatterplot and vizualize shape change across the X axis.
@@ -505,7 +717,7 @@ mm_grps_PlotArray <- function(A, grps){
 
 
 
-mm_Viz_shapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1), cols = NULL, title = "", png_dir = NULL){
+mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1), cols = NULL, title = "", png_dir = NULL){
 
 
   if(!any(class(mmPCA) %in% "mmPCA")){
@@ -658,15 +870,269 @@ mm_Viz_shapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1), cols = NULL,
 
 #' Build, implement, visualize multivariate linear model.
 #'
+#'Easily evaluate simple model sets (one covariate with up to 2 additional classifiers/covariates). Helpful for exploratory analysis.
 #'
+#' For detailed model or specific combinations of variables, see geomorph::procDlm for full use of this function.
+#'
+#'@param shape_data This will be the (multivariate) response variable
+#'@param ... Covariate(s)/classifier(s) to build a model set. Indvidual models are run (with interaction).
+#'@param subgrps Optional. Vector of group membership. Model sets will be run across the whole sample and subgroups. If k is specified, only the full model will be run.
+#'@param ff1 An explicit model to test in the format: " coords ~ ...". Names must match those specifed in `...`. Standard lm notation applies.
+#'@param univ_series Default (FALSE) will evaluate multiple covariates and their interaction in a single model. However, it can be helpful to understand the univariate effects in isolation of interation/confounding factors. Set univ_series to TRUE to produce a series of model sets, one for each covariate specified (NOTE: ff1 must also be NULL for this to work).
+#'
+#'@export
 
 
-mm_Model <- function(){
+mm_BuildModel <- function(shape_data, ..., subgrps= NULL, ff1 = NULL, univ_series=FALSE){
+
+  input_covs <- list(...)
+
+  chk_lengths <- lapply(input_covs, length)
+
+  nr <- dim(shape_data)[[3]]
+  if(!all(chk_lengths==nr)){
+    warning("Length of Covariate(s) does not match length of shape data.")
+  }
+
+  gdf0 <- geomorph::geomorph.data.frame("coords" = shape_data,  ...)
+
+  all_names <- names(gdf0)
+
+  covariates <- setdiff(all_names, "coords")
+
+  model_sets <- list()
+
+  ## Decide on model
+  if(is.null(ff1)){
+    ## Exploratory, attempt to test all combinations of covariates
+    mod_to_test <- paste("coords ~ ", paste(covariates, collapse = " * "), collapse = "")
+
+    } else {
+      ## EXPLICIT: Test a single explicit model once you know best fit
+      mod_to_test <- ff1
+  }
+
+
+
+  ## SPECIFIC model for GROUPS and WHOLE SAMPLE
+  if(!is.null(subgrps)){
+    ll <- length(levels(as.factor(subgrps)))
+
+    for(gg in 1:ll){
+        ## subset data
+        sub_gdf <- geomorph::geomorph.data.frame("coords" = gdf0$coords[,,subgrps==gg])
+        for(vv in 2:length(gdf0)){
+          sub_gdf[[vv]] = gdf0[[vv]][subgrps==gg]
+        }
+        names(sub_gdf) <- names(gdf0)
+
+
+        ## apply the model
+        model_sets[[gg]] <- list("ff" = mod_to_test)
+        model_sets[[gg]]$mod <- geomorph::procD.lm(as.formula(model_sets[[gg]]$ff), data = sub_gdf)
+        model_sets[[gg]]$summary <- summary(model_sets[[gg]]$mod)
+      }
+      names(model_sets) <- paste0("mvlm_gg",1:ll)
+
+      model_sets$mvlm_all <- list("ff" = mod_to_test)
+      model_sets$mvlm_all$mod <- geomorph::procD.lm(as.formula(model_sets$mvlm_all$ff), data = gdf0)
+      model_sets$mvlm_all$summary <- summary(model_sets$mvlm_all$mod)
+
+      return(model_sets)
+
+    }
+
+  ## SPECIFC model for whole sample ONLY
+  if(!is.null(ff1)){
+    model_sets$mvlm_all <- list("ff" = mod_to_test)
+    model_sets$mvlm_all$mod <- geomorph::procD.lm(as.formula(model_sets$mvlm_all$ff), data = gdf0)
+    model_sets$mvlm_all$summary <- summary(model_sets$mvlm_all$mod)
+
+    return(model_sets)
+  }
+
+
+  ## EXPLORE COVARIATES AS A UNIVARIATE SERIES
+  if(univ_series){
+    for (nn in 1:length(covariates)){
+      model_sets[[nn]] <- list("ff" = paste("coords ~ ", covariates[nn], collapse = ""))
+      model_sets[[nn]]$mod <- geomorph::procD.lm(as.formula(model_sets[[nn]]$ff), data = gdf0)
+      model_sets[[nn]]$summary <- summary(model_sets[[nn]]$mod)
+    }
+
+    names(model_sets) <- paste0("mvlm_co", 1:length(covariates))
+    return(model_sets)
+
+  }
+
+
+
+  ## EXPLORE COVARIATES and INTERACTIONS across whole sample
+
+
+  for (nn in 1:length(covariates)){
+    model_sets[[nn]] <- list("ff" = paste("coords ~ ", paste(covariates[1:nn], collapse = " * "), collapse = ""))
+    model_sets[[nn]]$mod <- geomorph::procD.lm(as.formula(model_sets[[nn]]$ff), data = gdf0)
+    model_sets[[nn]]$summary <- summary(model_sets[[nn]]$mod)
+
+
+  }
+
+  names(model_sets) <- paste0("mvlm", 1:length(covariates))
+
+  return(model_sets)
+
 
 
 }
 
 
 
+#' Visualize Multivariate LM
+#'
+#' Visualize 2D scatterplot of mvlm including predicted shapes.
+#'
+#' @param dat Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)
+#' @param clas_col A classifier to color the data by. If null (default) all points will be grey. Otherwise, data will be plotted as rainbow(n) colors.
+#'
+#' @export
 
 
+mm_VizModel <- function(dat, clas_col = NULL){
+
+  ## f1 a formula
+  ## coords a [p x k x n] matrix of landmark data
+  ## covaraites continuous variables to model
+  ## classifiers ranked/categorical/binary variables to model
+  ## ... a formula to pass to
+
+  out <- list()
+
+  n_ind <- nrow(dat$data)
+  png("_mm_tmp__.png")
+  ratX <- plot(dat,
+               type = "regression",
+               predictor = dat$data[[2]],
+               reg.type = "RegScore")
+  dev.off()
+  file.remove("_mm_tmp__.png")
+
+  predsX <- geomorph::shape.predictor(dat$GM$fitted,
+                            x = ratX$RegScore,
+                            min = min(ratX$RegScore),
+                            max = max(ratX$RegScore)
+  )
+
+  predsX <- lapply(predsX, function(x){
+
+    nr <- nrow(x)
+    nc <- ncol(x)
+
+    x <- matrix(x, nrow=nr, ncol = nc)
+  })
+
+  if(is.null(clas_col)){
+
+    clas_col <- hsv(1,.01,.6, alpha = .6)
+    all_cols <- data.frame("col" = rep(clas_col, ))
+
+  } else {
+    ## make colors better.
+    ll <- length(levels(as.factor(clas_col)))
+
+
+    all_cols <- data.frame("class" = clas_col,
+                           "col" = character(n_ind))
+
+    cc <- rainbow(ll,
+                  s = .8, v = .6, alpha = .5)
+    for (i in seq(ll)) {
+      all_cols$col[as.integer(all_cols$class) == i] <- cc[i]
+
+    }
+  }
+
+  names(predsX) <- c("min", "max")
+
+
+
+  ## plot regMin, scatterplot, regMax
+
+  layout(matrix(c(1,2,2,3), ncol = 4))
+
+  yset <- c(0,1)
+
+  xlabmod <- names(dat$data)[2] ## this should always be the primary response
+
+  plot(predsX$min, type = "l", lwd = 3, col = hsv(.6,.6,1), xlab = "", ylab = "", ylim = c(0,1))
+  plot(ratX$plot.args, pch = 16, col = all_cols$col, xlab = xlabmod, ylab = "RegScore", cex = 3)
+  plot(predsX$max, type = "l", lwd = 3, col = hsv(1,.6,1), xlab = "", ylab = "", ylim= c(0,1))
+
+
+  layout(matrix(1))
+
+  out$mvlm <- dat
+  out$summary <- summary(dat)
+  out$Shapes <- list("RegMin" = predsX$min,
+                     "RegMax" = predsX$max)
+
+
+  return(out)
+}
+
+
+
+
+
+
+
+mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
+                        fillCol = "grey", smoothness = 20)
+{
+  sm <- smoothness
+  if (ci == 90) {
+    chi.v <- 4.605
+  }
+  else if (ci == 95) {
+    chi.v <- 5.991
+  }
+  else if (ci == 99) {
+    chi.v <- 9.21
+  }
+  else if (ci == 67.5) {
+    chi.v <- 2.25
+  }
+  else {
+    stop("Invalid CI, please choose either 90,95, or 99")
+  }
+  cov.dat <- cov(dat)
+  cent <- t(colMeans(dat))
+  tr <- sum(cov.dat[1, 1], cov.dat[2, 2])
+  det <- ((cov.dat[1, 1] * cov.dat[2, 2]) - (cov.dat[1, 2] *
+                                               cov.dat[2, 1]))
+  ei1 <- (tr + ((tr^2) - 4 * det)^0.5)/2
+  ei2 <- tr - ei1
+  ei.a <- (ei1^0.5) * (chi.v^0.5)
+  ei.b <- (ei2^0.5) * (chi.v^0.5)
+  th <- atan2((ei1 - cov.dat[1, 1]), cov.dat[1, 2])
+  q <- matrix(nrow = 2, ncol = 2)
+  q[1, 1] <- cos(th)
+  q[2, 2] <- cos(th)
+  q[2, 1] <- sin(th)
+  q[1, 2] <- sin(th) * -1
+  circ <- matrix(nrow = 2 * sm + 1, ncol = 3)
+  for (i in 1:dim(circ)[1]) {
+    circ[i, 1] <- (i - 1) * (pi/sm)
+    circ[i, 2] <- (q[1, 1] * ei.a * cos(circ[i, 1]) + q[1,
+                                                        2] * ei.b * sin(circ[i, 1])) + cent[1, 1]
+    circ[i, 3] <- (q[2, 1] * ei.a * cos(circ[i, 1]) + q[2,
+                                                        2] * ei.b * sin(circ[i, 1])) + cent[1, 2]
+  }
+  if (is.null(fillCol)) {
+    lines(circ[, c(2, 3)], col = linesCol)
+  }
+  else {
+    polygon(circ[, c(2, 3)], col = fillCol)
+    lines(circ[, c(2, 3)], col = linesCol, lwd = 1.5)
+  }
+}

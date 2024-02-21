@@ -12,7 +12,8 @@ mm_PlotArray(
   MeanCol = NULL,
   plot_type = c("lines", "points"),
   lbl = NULL,
-  yr = NULL
+  yr = NULL,
+  axis_labels = FALSE
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ mm_PlotArray(
 \item{lbl}{A title (main =) for the plot. If NULL (default) the name of the array will be used.}
 
 \item{yr}{Y-range, in the form c(0,100)}
+
+\item{axis_labels}{Should units be printed along the axis. Defaults to FALSE to maximize the profile shape.}
 }
 \description{
 Plot Array

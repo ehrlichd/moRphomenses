@@ -8,7 +8,7 @@ mm_VizShapespace(
   mmPCA,
   xPC = 1,
   yPC = 2,
-  yr = c(0, 1),
+  yr = c(0, 1.1),
   cols = NULL,
   title = "",
   png_dir = NULL

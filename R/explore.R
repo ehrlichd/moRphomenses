@@ -170,8 +170,6 @@ mm_Diagnostics <- function(dat, max_PC_viz=10, max_PC_calc=NULL, hide_plots = FA
 
 
 
-  ## DEMOGRAPHICS??
-
   class(out) <- "mmDiag"
 
   return(out)
@@ -239,7 +237,7 @@ mm_Phenotype <- function(dat, kgrps, cuttree_h=NULL, cuttree_k=NULL, plot_figs=T
   if(plot_figs){
 
     ## plot mshp
-    mm_PlotArray(out$ALN,lbl = "Whole Sample")
+    mm_PlotArray(out$ALN,lbl = "Full Sample",axis_labels = TRUE)
 
 
     if(!is.null(kgrps)){
@@ -251,7 +249,11 @@ mm_Phenotype <- function(dat, kgrps, cuttree_h=NULL, cuttree_k=NULL, plot_figs=T
       m_cols <- rainbow(ll_kgrps, .8, .4)
 
       for(k in uu_kgrps){
-        mm_PlotArray(out$ALN[,,out$k_grps$cluster==k], "lbl" = paste0("kmeans_", k), MeanCol = m_cols[k], AllCols = all_cols[k])
+        mm_PlotArray(out$ALN[,,out$k_grps$cluster==k],
+                     "lbl" = paste0("kgrp_ ", k),
+                     MeanCol = m_cols[k],
+                     AllCols = all_cols[k],
+                     axis_labels = TRUE)
       }
     }
 
@@ -263,7 +265,12 @@ mm_Phenotype <- function(dat, kgrps, cuttree_h=NULL, cuttree_k=NULL, plot_figs=T
       m_cols <- rainbow(ll_cth_grps, .8, .4)
 
       for(h in uu_cth_grps){
-        mm_PlotArray(out$ALN[,,out$cth_grps==h], "lbl" = paste0("hcut_", h), MeanCol = m_cols[h], AllCols = all_cols[h])
+        mm_PlotArray(out$ALN[,,out$cth_grps==h],
+                     "lbl" = paste0("hcut_", h),
+                     MeanCol = m_cols[h],
+                     AllCols = all_cols[h],
+                     axis_labels = TRUE
+                     )
       }
     }
 
@@ -275,7 +282,11 @@ mm_Phenotype <- function(dat, kgrps, cuttree_h=NULL, cuttree_k=NULL, plot_figs=T
       m_cols <- rainbow(ll_ctk_grps, .8, .4)
 
       for(k in uu_ctk_grps){
-        mm_PlotArray(out$ALN[,,out$ctk_grps==k], "lbl" = paste0("kcut_", k), MeanCol = m_cols[k], AllCols = all_cols[k])
+        mm_PlotArray(out$ALN[,,out$ctk_grps==k],
+                     "lbl" = paste0("kcut_", k),
+                     MeanCol = m_cols[k],
+                     AllCols = all_cols[k],
+                     axis_labels = TRUE)
       }
     }
 
@@ -353,6 +364,7 @@ mm_CheckImputation <- function(A1, A2, ObO = TRUE){
 #' @param plot_type Should the data be plotted as points or lines.
 #' @param lbl A title (main =) for the plot. If NULL (default) the name of the array will be used.
 #' @param yr Y-range, in the form c(0,100)
+#' @param axis_labels Should units be printed along the axis. Defaults to FALSE to maximize the profile shape.
 #' @export
 #'
 #'
@@ -364,10 +376,8 @@ mm_PlotArray <- function(A,
                          MeanCol = NULL,
                          plot_type = c("lines", "points"),
                          lbl = NULL,
-                         yr = NULL){
-  ## added lbl and yr arguments
-  ## added flexibility for missing data (i think)
-  ## can handle groups of n=1
+                         yr = NULL,
+                         axis_labels = FALSE){
 
   ## default to lines
   if(identical(plot_type, c("lines", "points"))){
@@ -407,30 +417,40 @@ mm_PlotArray <- function(A,
   }
 
 
+  if(axis_labels){
+    par("mar" = c(2,2,2,1))
+  } else {
+    par("mar" = c(1,1,2,1))
+  }
+
 
   if(n == 1){
     mshp <- A
 
     if(plot_type == "points"){
-      plot( mar = c(1,2,1,1),
-            mshp, col = MeanCol, cex = 1.5, main = lbl, ylim = y, xlab = "", ylab = "")
+      plot(
+        #mar = c(1,2,1,1),
+        mshp, col = MeanCol, cex = 1.5, main = lbl, ylim = y, xlab = "", ylab = "")
     } else {
-      plot( mar = c(1,2,1,1),
-            mshp, col = MeanCol, type = "l", lwd = 3, main = lbl, ylim = y, xlab = "", ylab = "")
+      plot(
+        #mar = c(1,2,1,1),
+        mshp, col = MeanCol, type = "l", lwd = 3, main = lbl, ylim = y, xlab = "", ylab = "")
     }
 
-    return()
 
   } else {
-    mshp <- apply(A, c(1,2),
+
+
+
+
+  mshp <- apply(A, c(1,2),
                   function(x){
                     mean(x, na.rm= T)
                   })
-  }
 
-par("mar" = c(1,1,2,.5))
+
   plot(
-    mar = c(1,2,1,1),
+    # mar = c(1,2,1,1),
     mshp, type = "n", main = lbl, ylim = y, xlab = "", ylab = "")
 
   if(plot_type == "points"){
@@ -445,9 +465,12 @@ par("mar" = c(1,1,2,.5))
     for(i in 1:n){
       points(A[,1:2,i], col = AllCols[i], type = "l")
     }
+
     if(MeanShape){
-      points(mshp, col = MeanCol, type = "l", lwd = 3)
+      points(mshp, col = MeanCol, type = "l", lwd = 3, lty = 2)
     }
+  }
+
   }
 }
 
@@ -571,7 +594,7 @@ mm_pretty_pca <- function(PCA, xPC=1, yPC=2, clas_col = NULL, legend_cex = .8) {
 
   }
 
-  if (class(clas_col) != "factor") {
+  if (inherits(clas_col, "factor")) {
     clas_col <- factor(clas_col)
   }
 
@@ -717,7 +740,7 @@ mm_pretty_pca <- function(PCA, xPC=1, yPC=2, clas_col = NULL, legend_cex = .8) {
 
 
 
-mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1), cols = NULL, title = "", png_dir = NULL){
+mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1.1), cols = NULL, title = "", png_dir = NULL){
 
 
   if(!any(class(mmPCA) %in% "mmPCA")){
@@ -737,11 +760,13 @@ mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1), cols = NULL, 
       png(filename = out_path, height = 4, width = 10, units = "in",res = 300,family = "cairo")
     }
 
-    layout(matrix(1:3, ncol =3))
+    layout(matrix(c(2,2,2,2,1,1,3,3,3,3,
+                    2,2,2,2,1,1,3,3,3,3), ncol =10, byrow = TRUE))
 
-    plot(mmPCA$Shapes[[xPC]]$min, col = "cyan", bty = "n", xlab = "", ylab = "", type = "l", lwd = 2, ylim = yr, main = paste("PC", xPC, "min"))
-    points(mmPCA$Shapes$GrandM, col = "grey", type = "l")
 
+    ## Plot scatterplot first,
+
+    par("mar" = c(.5,.5,.5,.5))
 
     plot(density(mmPCA$PCA$x[,xPC]), main = title, xlab = x_lab, ylab = y_lab, as= T, bty = "n", xaxt = "n", yaxt = "n", type = "n")
     abline(h = 0, col = "grey", lty = 2)
@@ -751,11 +776,20 @@ mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1), cols = NULL, 
     #text(xax, rep(0, 5), labels = round(xax),cex = 1, col = "blue", pos = 1)
 
 
+
+    ## Plot Min shape
+
+    par("mar" = c(2,2,2,1))
+    plot(mmPCA$Shapes[[xPC]]$min, col = "cyan", bty = "n", xlab = "", ylab = "", type = "l", lwd = 2, ylim = yr, main = paste("PC", xPC, "min"))
+    points(mmPCA$Shapes$GrandM, col = "black", type = "l", lty = 2)
+
+
+    ## Plot Max Shape
+
     plot(mmPCA$Shapes[[xPC]]$max, col = "blue", bty = "n", xlab = "", ylab = "", type = "l", lwd = 2, ylim = yr, main = paste("PC", xPC, "max"))
-    points(mmPCA$Shapes$GrandM, col = "grey", type = "l")
+    points(mmPCA$Shapes$GrandM, col = "black", type = "l", lty = 2)
 
 
-    ## Bivariate plots - big
 
   } else {
 
@@ -774,31 +808,31 @@ mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1), cols = NULL, 
     y_lab <- paste("PC", yPC, ": ", mmPCA$PCA$eigs[1,yPC]*100, "% Var")
 
 
-    layout(matrix(c(0,0,0, 5,5,5,0, 0,0,0,
-                    0,0,0, 5,5,5,0, 6,6,6,
-                    0,0,0, 5,5,5,0, 6,6,6,
-                    0,0,0, 5,5,5,0, 0,0,0,
 
-                    1,1,1, 3,3,3,3, 4,4,4,
-                    1,1,1, 3,3,3,3, 4,4,4,
-                    1,1,1, 3,3,3,3, 4,4,4,
-                    1,1,1, 3,3,3,3, 4,4,4,
+    layout(matrix(c(
+                    0,0,0,0, 5,5,5,5, 0,0,0,0,
+                    0,0,0,0, 5,5,5,5, 0,0,0,0,
 
-                    0,0,0, 2,2,2,0, 7,7,0,
-                    0,0,0, 2,2,2,0, 7,7,0,
-                    0,0,0, 2,2,2,0, 7,7,0,
-                    0,0,0, 2,2,2,0, 0,0,0
-                    ), byrow = T, ncol=10, nrow = 12))
+                    0,0,0,0, 3,3,3,3, 0,0,0,0,
+                    1,1,1,1, 3,3,3,3, 4,4,4,4,
+                    1,1,1,1, 3,3,3,3, 4,4,4,4,
+                    0,0,0,0, 3,3,3,3, 0,0,0,0,
+
+                    0,0,0,0, 2,2,2,2, 0,6,6,6,
+                    0,0,0,0, 2,2,2,2, 0,6,6,6
+    ), byrow = T, ncol=12, nrow = 8))
+
+
 
     par("mar" = c(2,2,2,1))
 
     ## xpc min
     plot(mmPCA$Shapes[[xPC]]$min, col = "cyan", bty = "n", xlab = "", ylab = "", type = "l", lwd = 2, ylim = yr, main = paste("PC", xPC, "min"))
-    points(mmPCA$Shapes$GrandM, col = "grey", type = "l")
+    points(mmPCA$Shapes$GrandM, col = "black", type = "l", lty = 2)
 
-    ## MODIFY FOR ypc min
+    ## ypc min
     plot(mmPCA$Shapes[[yPC]]$min, col = "cyan", bty = "n", xlab = "", ylab = "", type = "l", lwd = 2, ylim = yr, main = paste("PC", yPC, "min"))
-    points(mmPCA$Shapes$GrandM, col = "grey", type = "l")
+    points(mmPCA$Shapes$GrandM, col = "black", type = "l", lty = 2)
 
 
 
@@ -824,33 +858,23 @@ mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1), cols = NULL, 
     par("mar" = c(2,2,2,1))
 
     plot(mmPCA$Shapes[[xPC]]$max, col = "blue", bty = "n", xlab = "", ylab = "", type = "l", lwd = 2, ylim = yr, main = paste("PC", xPC, "max"))
-    points(mmPCA$Shapes$GrandM, col = "grey", type = "l")
+    points(mmPCA$Shapes$GrandM, col = "black", type = "l", lty = 2)
 
-    ## MODIFY for yPC max
+    ## yPC max
     plot(mmPCA$Shapes[[yPC]]$max, col = "blue", bty = "n", xlab = "", ylab = "", type = "l", lwd = 2, ylim = yr, main = paste("PC", yPC, "max"))
-    points(mmPCA$Shapes$GrandM, col = "grey", type = "l")
+    points(mmPCA$Shapes$GrandM, col = "black", type = "l", lty = 2)
   }
 
 
-  ## PLOT Summary stuff
+  ## PLOT Eigs
 
-  par("mar" = c(0,0,.1,.1))
-  barplot(mmPCA$PCA$eigs[1,1:10])
+  par("mar" = c(2,2,2,1))
+  barplot(mmPCA$PCA$eigs[1,1:15], ylim = c(0, .25), main = "PC Loadings")
   barplot(mmPCA$PCA$eigs[1,c(xPC, yPC)], col = "red", add= T)
+  abline(h = .25, col = "grey", lty = 2)
+  abline(h = .05, col = "dark grey", lty = 2)
 
 
-  plot(1:12, xlab = "", ylab = "", as= T, bty = "n", xaxt = "n", yaxt = "n", type = "n")
-  text(x=4, y=12, labels = paste0("n:   " , nrow(mmPCA$PCA$x)))
-  text(x=5, y=11, labels = c("Eigs.    Cumul"))
-  pad <- 1
-  for(ii in 1:10){
-    pad <- pad + 1
-    text(x=7, y=11-pad,
-         labels = paste0(
-           paste0("PC", ii, ":  "),
-           paste(t(round(mmPCA$PCA$eigs[,ii],2)),collapse = "    "))
-         )
-  }
 
   if(!is.null(png_dir)){
     dev.off()
@@ -1058,14 +1082,27 @@ mm_VizModel <- function(dat, clas_col = NULL){
 
   ## plot regMin, scatterplot, regMax
 
-  layout(matrix(c(1,2,2,3), ncol = 4))
+  layout(matrix(c(0,0,0,0,2,2,2,2,2,2,3,3,3,3,
+                  0,0,0,0,2,2,2,2,2,2,3,3,3,3,
+                  0,0,0,0,2,2,2,2,2,2,0,0,0,0,
+                  0,0,0,0,2,2,2,2,2,2,0,0,0,0,
+                  1,1,1,1,2,2,2,2,2,2,0,0,0,0,
+                  1,1,1,1,2,2,2,2,2,2,0,0,0,0), ncol = 14, byrow = TRUE))
 
   yset <- c(0,1)
 
   xlabmod <- names(dat$data)[2] ## this should always be the primary response
 
+  par("mar" = c(2,2,1,1))
   plot(predsX$min, type = "l", lwd = 3, col = hsv(.6,.6,1), xlab = "", ylab = "", ylim = c(0,1))
   plot(ratX$plot.args, pch = 16, col = all_cols$col, xlab = xlabmod, ylab = "RegScore", cex = 3)
+
+
+  ## add best fit line
+  tt_line <- lm(ratX$RegScore ~ ratX$plot.args$x)
+  abline(tt_line, col = "black", lty = 2)
+
+
   plot(predsX$max, type = "l", lwd = 3, col = hsv(1,.6,1), xlab = "", ylab = "", ylim= c(0,1))
 
 
@@ -1082,57 +1119,124 @@ mm_VizModel <- function(dat, clas_col = NULL){
 
 
 
+#' Compare Complex Model Metrics
+#'
+#' Compare key figs (Rsq, p-value, etc) across multiple complex models.
+#'
+#' @param mv_results Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)
+#' @param row_labels A character vector to use in output. If NULL (default) labels from the input data will be used.
+#' @param var_labels A character vector to use in output. If NULL (default) labels from the input data will be used.
+#'
+#' @export
 
 
 
+mm_CompModel_Full <- function(mv_results, row_labels = NULL, var_labels = NULL){
 
-mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
-                        fillCol = "grey", smoothness = 20)
-{
-  sm <- smoothness
-  if (ci == 90) {
-    chi.v <- 4.605
+
+  if(is.null(names(mv_results))){
+    stop("Input data must be a list where each model has a unique name.")
+  } else {
+    mod_labels <- names(mv_results)
   }
-  else if (ci == 95) {
-    chi.v <- 5.991
+
+  n_mods <- length(mod_labels)
+
+  var_names <- rownames(mv_results[[1]]$summary$table)
+  n_vars <- length(var_names)
+  out_list <- vector(mode = "list", length = n_vars)
+
+  fill_tab <- data.frame("Rsq" = rep(NA, times = n_mods),
+                         "F" = rep(NA, times = n_mods),
+                         "Pr(>F)" = rep(NA, times = n_mods)
+  )
+
+  out_list <- lapply(out_list, function(x){
+    x <- fill_tab
+  })
+
+
+  for(mm in seq_along(mod_labels)){
+
+    for(vv in 1:n_vars){
+      tmp_tab <- mv_results[[mod_labels[mm]]]$summary$table[vv,c("Rsq", "F", "Pr(>F)")]
+      out_list[[vv]][mm,] <- tmp_tab
+    }
+
   }
-  else if (ci == 99) {
-    chi.v <- 9.21
+
+  if(is.null(var_labels)){
+    var_labels <- var_names
   }
-  else if (ci == 67.5) {
-    chi.v <- 2.25
+
+  if(is.null(row_labels)){
+    row_labels <- mod_labels
   }
-  else {
-    stop("Invalid CI, please choose either 90,95, or 99")
-  }
-  cov.dat <- cov(dat)
-  cent <- t(colMeans(dat))
-  tr <- sum(cov.dat[1, 1], cov.dat[2, 2])
-  det <- ((cov.dat[1, 1] * cov.dat[2, 2]) - (cov.dat[1, 2] *
-                                               cov.dat[2, 1]))
-  ei1 <- (tr + ((tr^2) - 4 * det)^0.5)/2
-  ei2 <- tr - ei1
-  ei.a <- (ei1^0.5) * (chi.v^0.5)
-  ei.b <- (ei2^0.5) * (chi.v^0.5)
-  th <- atan2((ei1 - cov.dat[1, 1]), cov.dat[1, 2])
-  q <- matrix(nrow = 2, ncol = 2)
-  q[1, 1] <- cos(th)
-  q[2, 2] <- cos(th)
-  q[2, 1] <- sin(th)
-  q[1, 2] <- sin(th) * -1
-  circ <- matrix(nrow = 2 * sm + 1, ncol = 3)
-  for (i in 1:dim(circ)[1]) {
-    circ[i, 1] <- (i - 1) * (pi/sm)
-    circ[i, 2] <- (q[1, 1] * ei.a * cos(circ[i, 1]) + q[1,
-                                                        2] * ei.b * sin(circ[i, 1])) + cent[1, 1]
-    circ[i, 3] <- (q[2, 1] * ei.a * cos(circ[i, 1]) + q[2,
-                                                        2] * ei.b * sin(circ[i, 1])) + cent[1, 2]
-  }
-  if (is.null(fillCol)) {
-    lines(circ[, c(2, 3)], col = linesCol)
-  }
-  else {
-    polygon(circ[, c(2, 3)], col = fillCol)
-    lines(circ[, c(2, 3)], col = linesCol, lwd = 1.5)
-  }
+
+  out_list <- lapply(out_list, function(x){
+    rownames(x) <- row_labels
+    return(x)
+  })
+
+  names(out_list) <- var_labels
+
+  sub_list <- out_list[!names(out_list) %in% c("Residuals", "Total")]
+
+  return(sub_list)
+
+
 }
+
+
+#' Compare Model Metrics
+#'
+#' Compare key figs (Rsq, p-value, etc) across multiple models.
+#'
+#' @param mv_results Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)
+#' @param row_labels A character vector to use in output. If NULL (default) labels from the input data will be used.
+#'
+#' @export
+
+
+mm_CompModel <- function(mv_results, row_labels = NULL){
+
+
+  if(is.null(names(mv_results))){
+    stop("Input data must be a list where each model has a unique name.")
+  } else {
+    mod_labels <- names(mv_results)
+  }
+
+  n_mods <- length(mod_labels)
+
+  out_tab <- data.frame("Rsq" = rep(NA, times = n_mods),
+                        "F" = rep(NA, times = n_mods),
+                        "Pr(>F)" = rep(NA, times = n_mods)
+  )
+
+
+  for(mm in seq_along(mod_labels)){
+
+    tmp_tab <- mv_results[[mod_labels[mm]]]$summary$table[1,c("Rsq", "F", "Pr(>F)")]
+    out_tab[mm,] <- tmp_tab
+
+
+  }
+
+
+  if(is.null(row_labels)){
+    row_labels <- mod_labels
+  }
+
+  rownames(out_tab) <- row_labels
+
+
+  return(out_tab)
+
+
+}
+
+
+
+
+

@@ -44,7 +44,7 @@ mm_ScreePlot <- function(x, maxC = 15, ...) {
   }
   plot(1:max_i, wss, type = "b",
        xlab = "Number of Clusters",
-       ylab = "Within groups sum of squares",
+       ylab = "Mean w/i group SSE",
        las = 2, ...)
 }
 
@@ -68,7 +68,7 @@ mm_SilPlot <- function(x, maxC=15, ...) {
   sw <- sw[-1]
   plot(2:max_i, sw, type = "b",
        xlab = "Number of Clusters",
-       ylab = "Average silhouette width", ...)
+       ylab = "Avg. sil. wid.", ...)
 }
 
 
@@ -194,7 +194,66 @@ mm_mute_cols <- function(cols, s=NULL,v=NULL,alpha=.4){
 }
 
 
+#'  Add confidence ellipses to a scatterplot.
+#'
+#'
+#' @param dat A matrix of data to draw an ellipses around.
+#' @param ci Percentage of data to capture. Must be one of c(67.5, 90, 95, 99).
+#' @param linesCol Border color of the shape.
+#' @param fillCol Fill color of the shape.
+#' @param smoothness Lower values will look jagged, higher value will make smoother lines, but may take a long time to plot. Default value is 20.
+#' @export
 
+mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
+                        fillCol = "grey", smoothness = 20)
+{
+  sm <- smoothness
+  if (ci == 90) {
+    chi.v <- 4.605
+  }
+  else if (ci == 95) {
+    chi.v <- 5.991
+  }
+  else if (ci == 99) {
+    chi.v <- 9.21
+  }
+  else if (ci == 67.5) {
+    chi.v <- 2.25
+  }
+  else {
+    stop("Invalid CI, please choose either 90,95, or 99")
+  }
+  cov.dat <- cov(dat)
+  cent <- t(colMeans(dat))
+  tr <- sum(cov.dat[1, 1], cov.dat[2, 2])
+  det <- ((cov.dat[1, 1] * cov.dat[2, 2]) - (cov.dat[1, 2] *
+                                               cov.dat[2, 1]))
+  ei1 <- (tr + ((tr^2) - 4 * det)^0.5)/2
+  ei2 <- tr - ei1
+  ei.a <- (ei1^0.5) * (chi.v^0.5)
+  ei.b <- (ei2^0.5) * (chi.v^0.5)
+  th <- atan2((ei1 - cov.dat[1, 1]), cov.dat[1, 2])
+  q <- matrix(nrow = 2, ncol = 2)
+  q[1, 1] <- cos(th)
+  q[2, 2] <- cos(th)
+  q[2, 1] <- sin(th)
+  q[1, 2] <- sin(th) * -1
+  circ <- matrix(nrow = 2 * sm + 1, ncol = 3)
+  for (i in 1:dim(circ)[1]) {
+    circ[i, 1] <- (i - 1) * (pi/sm)
+    circ[i, 2] <- (q[1, 1] * ei.a * cos(circ[i, 1]) + q[1,
+                                                        2] * ei.b * sin(circ[i, 1])) + cent[1, 1]
+    circ[i, 3] <- (q[2, 1] * ei.a * cos(circ[i, 1]) + q[2,
+                                                        2] * ei.b * sin(circ[i, 1])) + cent[1, 2]
+  }
+  if (is.null(fillCol)) {
+    lines(circ[, c(2, 3)], col = linesCol)
+  }
+  else {
+    polygon(circ[, c(2, 3)], col = fillCol)
+    lines(circ[, c(2, 3)], col = linesCol, lwd = 1.5)
+  }
+}
 
 
 #' Generate Diagnostic Plots WIP

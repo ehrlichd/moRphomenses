@@ -594,7 +594,7 @@ mm_pretty_pca <- function(PCA, xPC=1, yPC=2, clas_col = NULL, legend_cex = .8) {
 
   }
 
-  if (inherits(clas_col, "factor")) {
+  if (!inherits(clas_col, "factor")) {
     clas_col <- factor(clas_col)
   }
 

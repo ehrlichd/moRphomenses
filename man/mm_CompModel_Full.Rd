@@ -4,7 +4,7 @@
 \alias{mm_CompModel_Full}
 \title{Compare Complex Model Metrics}
 \usage{
-mm_CompModel_Full(mv_results, row_labels = NULL, var_labels = NULL)
+mm_CompModel_Full(mv_results, row_labels = NULL, var_labels = NULL, digits = 4)
 }
 \arguments{
 \item{mv_results}{Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)}
@@ -12,6 +12,8 @@ mm_CompModel_Full(mv_results, row_labels = NULL, var_labels = NULL)
 \item{row_labels}{A character vector to use in output. If NULL (default) labels from the input data will be used.}
 
 \item{var_labels}{A character vector to use in output. If NULL (default) labels from the input data will be used.}
+
+\item{digits}{Number of decimal places to round to. Default includes 4 decimal places.}
 }
 \description{
 Compare key figs (Rsq, p-value, etc) across multiple complex models.

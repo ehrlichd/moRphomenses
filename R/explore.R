@@ -1127,11 +1127,13 @@ mm_VizModel <- function(dat, clas_col = NULL){
 #' @param row_labels A character vector to use in output. If NULL (default) labels from the input data will be used.
 #' @param var_labels A character vector to use in output. If NULL (default) labels from the input data will be used.
 #'
+#' @param digits Number of decimal places to round to. Default includes 4 decimal places.
+#'
 #' @export
 
 
 
-mm_CompModel_Full <- function(mv_results, row_labels = NULL, var_labels = NULL){
+mm_CompModel_Full <- function(mv_results, row_labels = NULL, var_labels = NULL, digits = 4){
 
 
   if(is.null(names(mv_results))){
@@ -1182,6 +1184,17 @@ mm_CompModel_Full <- function(mv_results, row_labels = NULL, var_labels = NULL){
 
   sub_list <- out_list[!names(out_list) %in% c("Residuals", "Total")]
 
+  if(is.numeric(digits)){
+    sub_list <- lapply(sub_list, function(x){
+      round(x, digits = digits)
+    })
+  }
+
+  sub_list <- lapply(sub_list, function(x){
+    names(x)[names(x)=="Pr(>F)"] <- "p-val"
+  })
+
+
   return(sub_list)
 
 
@@ -1194,11 +1207,12 @@ mm_CompModel_Full <- function(mv_results, row_labels = NULL, var_labels = NULL){
 #'
 #' @param mv_results Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)
 #' @param row_labels A character vector to use in output. If NULL (default) labels from the input data will be used.
+#' @param digits Number of decimal places to round to. Default includes 4 decimal places.
 #'
 #' @export
 
 
-mm_CompModel <- function(mv_results, row_labels = NULL){
+mm_CompModel <- function(mv_results, row_labels = NULL, digits=4){
 
 
   if(is.null(names(mv_results))){
@@ -1229,7 +1243,12 @@ mm_CompModel <- function(mv_results, row_labels = NULL){
   }
 
   rownames(out_tab) <- row_labels
+  names(out_tab)[names(out_tab)=="Pr(>F)"] <- "p-val"
 
+
+  if(is.numeric(digits)){
+    out_tab <- round(out_tab, digits = digits)
+  }
 
   return(out_tab)
 

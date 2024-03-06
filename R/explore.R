@@ -1192,6 +1192,7 @@ mm_CompModel_Full <- function(mv_results, row_labels = NULL, var_labels = NULL, 
 
   sub_list <- lapply(sub_list, function(x){
     names(x)[names(x)=="Pr(>F)"] <- "p-val"
+    return(x)
   })
 
 

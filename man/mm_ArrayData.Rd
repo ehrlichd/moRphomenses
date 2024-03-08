@@ -9,8 +9,8 @@ mm_ArrayData(
   DAYS,
   VALUE,
   MID = NULL,
-  avgLENGTH,
-  avgMID = NULL,
+  targetLENGTH,
+  targetMID = NULL,
   transformation = c("minmax", "geom", "zscore", "log", "log10"),
   impute_missing = 3
 )
@@ -24,9 +24,9 @@ mm_ArrayData(
 
 \item{MID}{Am optional vector of midpoints to center each individuals profile. These should be unique to each individual and repeated for each observation of DAYS, VALUE, and IDs. If NULL (defualt), data will not be centered on any day.}
 
-\item{avgLENGTH}{Integer. Number of days to up/down sample observations to using \code{\link{mm_get_interval}}.}
+\item{targetLENGTH}{Integer. Number of days to up/down sample observations to using \code{\link{mm_get_interval}}.}
 
-\item{avgMID}{If NULL (default) data will not be centered and will range from 0 to 1. If specified, data will be centered on 0 ranging from -1 to 1.}
+\item{targetMID}{If NULL (default) data will not be centered and will range from 0 to 1. If specified, data will be centered on 0 ranging from -1 to 1.}
 
 \item{transformation}{Which (if any) data transformation to apply. Our reccomendation is minmax, but Geometric mean, Zscore, natural log and log10 transformations are available, if desired.}
 

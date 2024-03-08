@@ -8,8 +8,8 @@
 #' @param DAYS A vector that contains information on time, IE Day 1, Day 2, Day 3. Note: this vector should include integers, continuous data might produce unintended results.
 #' @param VALUE A vector containing the variable sampled.
 #' @param MID Am optional vector of midpoints to center each individuals profile. These should be unique to each individual and repeated for each observation of DAYS, VALUE, and IDs. If NULL (defualt), data will not be centered on any day.
-#' @param avgLENGTH Integer. Number of days to up/down sample observations to using \code{\link{mm_get_interval}}.
-#' @param avgMID If NULL (default) data will not be centered and will range from 0 to 1. If specified, data will be centered on 0 ranging from -1 to 1.
+#' @param targetLENGTH Integer. Number of days to up/down sample observations to using \code{\link{mm_get_interval}}.
+#' @param targetMID If NULL (default) data will not be centered and will range from 0 to 1. If specified, data will be centered on 0 ranging from -1 to 1.
 #' @param transformation Which (if any) data transformation to apply. Our reccomendation is minmax, but Geometric mean, Zscore, natural log and log10 transformations are available, if desired.
 #' @param impute_missing Integer. If not null, number of nearest-neighbors to use to impute missing data (Default = 3).
 #'
@@ -21,8 +21,8 @@ mm_ArrayData <-
            DAYS,
            VALUE,
            MID=NULL,
-           avgLENGTH,
-           avgMID = NULL,
+           targetLENGTH,
+           targetMID = NULL,
            transformation = c("minmax", "geom", "zscore", "log", "log10"),
            impute_missing = 3){
 
@@ -40,8 +40,8 @@ mm_ArrayData <-
 
 
 
-    aDat <- array(dim = c(avgLENGTH, 2, length(IDlevs)))
-    unsDat <- array(dim = c(avgLENGTH, 2, length(IDlevs)))
+    aDat <- array(dim = c(targetLENGTH, 2, length(IDlevs)))
+    unsDat <- array(dim = c(targetLENGTH, 2, length(IDlevs)))
     dimnames(aDat)[[3]] <- IDlevs
     dimnames(unsDat)[[3]] <- IDlevs
 
@@ -54,11 +54,11 @@ mm_ArrayData <-
 
     if(is.null(MID)){
       ## range will be 0 to 1
-      mshpx <- seq(from = 0, to = 1, length.out = avgLENGTH)
+      mshpx <- seq(from = 0, to = 1, length.out = targetLENGTH)
       dat1 <- data.frame(IDs, DAYS, VALUE)
     } else {
-      ## range will be -1 to 1 with 0 at avgMID
-      mshpx <- mm_get_interval(days = avgLENGTH, day0 = avgMID)
+      ## range will be -1 to 1 with 0 at targetMID
+      mshpx <- mm_get_interval(days = targetLENGTH, day0 = targetMID)
       dat1 <- data.frame(IDs, DAYS, VALUE, MID)
     }
 
@@ -183,12 +183,12 @@ mm_ArrayData <-
       shape_mat <- cbind(mms_x, mms_y)
       uns_mat <- cbind(mms_x, uns_y)
 
-      shape_fill <- matrix(nrow = avgLENGTH, ncol = 2)
-      uns_fill <- matrix(nrow = avgLENGTH, ncol = 2)
+      shape_fill <- matrix(nrow = targetLENGTH, ncol = 2)
+      uns_fill <- matrix(nrow = targetLENGTH, ncol = 2)
 
-      for (j in 1:avgLENGTH) {
+      for (j in 1:targetLENGTH) {
 
-        # threshold <- round((1/avgLENGTH),3) ## this seems to be causing problems
+        # threshold <- round((1/targetLENGTH),3) ## this seems to be causing problems
         threshold <- .05 ## previously .036
         sel_min <- mshpx[j]-threshold
         sel_max <- mshpx[j]+threshold

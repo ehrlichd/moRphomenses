@@ -2,17 +2,18 @@ Package: moRphomenses
 Title: Align, Scale, and Visualize "Shape" of Menstrual Cycle Hormones
 Version: 0.0.0.9000
 Authors@R: 
-   person(given = "Daniel", 
-                    family = "Ehrlich", 
-                    role = c("aut", "cre"), 
-                    email = "dan.ehrlich.e@gmail.com")
-Description: Geometric Morphometric based methods to study the shape/phenotype of hormone concentrations across the menstrual cycle.
+    person("Daniel", "Ehrlich", , "dan.ehrlich.e@gmail.com", role = c("aut", "cre"))
+Description: Geometric Morphometric based methods to study the
+    shape/phenotype of hormone concentrations across the menstrual cycle.
 License: GPL (>= 3.0)
-Imports: dendextend, cluster, geomorph
 URL: <https://github.com/ehrlichd/moRphomenses>
+Depends: 
+    R (>= 2.10)
+Imports: 
+    cluster,
+    dendextend,
+    geomorph
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
-Depends: 
-    R (>= 2.10)
+RoxygenNote: 7.3.1

@@ -1,6 +1,6 @@
 #' @name moRphomenses
 #'
-#' @aliases moRphomenses-package
+#' @aliases moRphomenses_PACKAGE
 #'
 #' @title Geometric Morphometric Analysis of Hormone Cycle Phenotypes
 #' @author Daniel E. Ehrlich
@@ -12,8 +12,8 @@
 #' @import graphics
 #' @import grDevices
 #' @import utils
-#' @import geomorph
-#' @import dendextend
+#' @importFrom geomorph shape.predictor
+#' @importFrom dendextend labels_colors
 #'
 #'
 #'

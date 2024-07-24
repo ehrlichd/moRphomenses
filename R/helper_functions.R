@@ -49,7 +49,7 @@ mm_ScreePlot <- function(x, maxC = 15, ...) {
 }
 
 
-#' Silouhete Width Plot
+#' Silhouette Width Plot
 #'
 #' Plot average silhouete widths to evaluate clusters
 #' @param x Input data for cluster analysis (IE PCA)
@@ -254,39 +254,4 @@ mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
     lines(circ[, c(2, 3)], col = linesCol, lwd = 1.5)
   }
 }
-
-
-#' Generate Diagnostic Plots WIP
-#'
-#' Generate various diagnostic plots
-#'
-#'
-#'
-#'
-
-
-## NOTE: need to figure out what the actual input/output of this should be.
-
-## data array is one main object; how to simplyfy the results of phenotyping??
-#
-# layout(matrix(1))
-# barplot(summary(PCA)$importance[2,1:maxPC], main = "PC Loadings")
-# abline(h = .05, col = "red")
-# abline(h = .01, col = "dark red")
-# pairs(PCA$x[,1:maxPC])
-#
-# layout(matrix(1))
-# plot(PCA$x[,1:2])
-#
-# layout(matrix(1))
-# plot(hcl)
-#
-# layout(matrix(1:2, ncol = 2))
-# mm_ScreePlot(PCA$x[,1:maxPC])
-# mm_SilPlot(PCA$x[,1:maxPC])
-# layout(matrix(1))
-
-
-
-
 

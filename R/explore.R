@@ -224,11 +224,11 @@ mm_Phenotype <- function(dat, kgrps, cuttree_h=NULL, cuttree_k=NULL, plot_figs=T
   }
 
   if(!is.null(cuttree_h)){
-    out$cth_grps <- dendextend::cutree(out$TREE, h = cuttree_h)
+    out$cth_grps <- stats::cutree(as.hclust(out$TREE), h = cuttree_h)
   }
 
   if(!is.null(cuttree_k)){
-    out$ctk_grps <- dendextend::cutree(out$TREE, k = cuttree_k)
+    out$ctk_grps <- stats::cutree(as.hclust(out$TREE), k = cuttree_k)
   }
 
 
@@ -1095,11 +1095,11 @@ mm_VizModel <- function(dat, clas_col = NULL){
 
   par("mar" = c(2,2,1,1))
   plot(predsX$min, type = "l", lwd = 3, col = hsv(.6,.6,1), xlab = "", ylab = "", ylim = c(0,1))
-  plot(ratX$plot.args, pch = 16, col = all_cols$col, xlab = xlabmod, ylab = "RegScore", cex = 3)
+  plot(ratX$plot_args, pch = 16, col = all_cols$col, xlab = xlabmod, ylab = "RegScore", cex = 3)
 
 
   ## add best fit line
-  tt_line <- lm(ratX$RegScore ~ ratX$plot.args$x)
+  tt_line <- lm(ratX$RegScore ~ ratX$plot_args$x)
   abline(tt_line, col = "black", lty = 2)
 
 

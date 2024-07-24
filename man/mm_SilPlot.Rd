@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper_functions.R
 \name{mm_SilPlot}
 \alias{mm_SilPlot}
-\title{Silouhete Width Plot}
+\title{Silhouette Width Plot}
 \usage{
 mm_SilPlot(x, maxC = 15, ...)
 }

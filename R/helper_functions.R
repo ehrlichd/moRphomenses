@@ -254,16 +254,3 @@ mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
     lines(circ[, c(2, 3)], col = linesCol, lwd = 1.5)
   }
 }
-
-#' Launch mm_Explorer
-#'
-#' @param dataset The dataset to be analyzed
-#' @export
-
-mm_Explorer <- function(dataset=NULL){
-  if(is.null(dataset)){
-    dataset <- mm_data
-  }
-
-  shiny::runApp(appDir=system.file("mm_Explorer"))
-}

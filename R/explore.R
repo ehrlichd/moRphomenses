@@ -48,11 +48,11 @@ mm_CalcShapespace <- function(dat, max_Shapes = 10){
 
   for(i in 1:max_Shapes){
 
-    out$Shapes[[i]] <- geomorph::shape.predictor(
-      A = dat,
-      x = out$PCA$x[,i],
-      min = min(out$PCA$x[,i]),
-      max = max(out$PCA$x[,i]))
+
+    out$Shapes[[i]] <- list(
+      "min" = mm_coords_to_shape(A=dat, PCA = out$PCA, target_coords = -1, target_PCs = i),
+      "max" = mm_coords_to_shape(A=dat, PCA = out$PCA, target_coords = 1, target_PCs = i)
+    )
 
   }
   names(out$Shapes) <- paste0("PC", 1:max_Shapes)

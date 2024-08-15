@@ -265,14 +265,14 @@ mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
 #' @param target_PCs Integer identifying which pc to use on the X and Y axis. Default is c(1,2) for PC1 on x and PC2 on y
 
 mm_coords_to_shape <- function (A, PCA, target_coords, target_PCs = c(1,2)){
-  if(!is.numeric(coords)){
-    coords <- as.numeric(coords)
+  if(!is.numeric(target_coords)){
+    target_coords <- as.numeric(target_coords)
   }
 
   mshp <- apply(A, margin = c(1,2), mean)
   nr <- nrow(mshp)
 
-  new_shape_long <- matrix(coords, ncol = 2, nrow= 1) %*% t(PCA$rotation[,target_PCs])
+  new_shape_long <- matrix(target_coords, ncol = 2, nrow= 1) %*% t(PCA$rotation[,target_PCs])
   new_shape <- matrix(new_shape_long, nrow = nr, ncol = 2, byrow = TRUE)
   new_shape <- new_shape + mshp
   new_shape

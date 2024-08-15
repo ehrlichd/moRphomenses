@@ -263,6 +263,8 @@ mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
 #' @param coords A single set of X,Y coordinates.
 #' @param PCA output of prcomp. Should contain $transormation
 #' @param target_PCs Integer identifying which pc to use on the X and Y axis. Default is c(1,2) for PC1 on x and PC2 on y
+#' @export
+#'
 
 mm_coords_to_shape <- function (A, PCA, target_coords, target_PCs = c(1,2)){
   if(!is.numeric(target_coords)){
@@ -272,7 +274,13 @@ mm_coords_to_shape <- function (A, PCA, target_coords, target_PCs = c(1,2)){
   mshp <- apply(A, c(1,2), mean)
   nr <- nrow(mshp)
 
-  new_shape_long <- matrix(target_coords, ncol = 2, nrow= 1) %*% t(PCA$rotation[,target_PCs])
+  if(length(target_coords)==2){
+    coords_mat <- matrix(target_cords, ncol = 2, nrow = 1)
+  } else {
+    coords_mat <- matrix(target_coords)
+  }
+
+  new_shape_long <- coords_mat %*% t(PCA$rotation[,target_PCs])
   new_shape <- matrix(new_shape_long, nrow = nr, ncol = 2, byrow = TRUE)
   new_shape <- new_shape + mshp
   new_shape

@@ -275,7 +275,7 @@ mm_coords_to_shape <- function (A, PCA, target_coords, target_PCs = c(1,2)){
   nr <- nrow(mshp)
 
   if(length(target_coords)==2){
-    coords_mat <- matrix(target_cords, ncol = 2, nrow = 1)
+    coords_mat <- matrix(target_coords, ncol = 2, nrow = 1)
   } else {
     coords_mat <- matrix(target_coords)
   }

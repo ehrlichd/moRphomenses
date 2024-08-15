@@ -269,7 +269,7 @@ mm_coords_to_shape <- function (A, PCA, target_coords, target_PCs = c(1,2)){
     target_coords <- as.numeric(target_coords)
   }
 
-  mshp <- apply(A, margin = c(1,2), mean)
+  mshp <- apply(A, c(1,2), mean)
   nr <- nrow(mshp)
 
   new_shape_long <- matrix(target_coords, ncol = 2, nrow= 1) %*% t(PCA$rotation[,target_PCs])

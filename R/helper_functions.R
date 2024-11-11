@@ -365,6 +365,7 @@ print_summary <- function(aln, grps = NULL){
     }
 
   }
+  out
 
 }
 

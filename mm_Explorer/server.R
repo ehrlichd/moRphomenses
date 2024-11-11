@@ -25,17 +25,28 @@ server <- function(input, output) {
     "aln_var" = "MIDPOINT",
     "mm_dataset" = mm_data,
     "n_inds" = 75, ## hard coded, but should be alright
-    "aln_11" = NULL,
-    "data_ready" = FALSE
+    "aln_11" = NULL
   )
 
+  data_ready <- reactiveVal(FALSE)
+
+
+  rv_aln <- reactiveValues(
+    "Shape_data" = NULL,
+    "Size_data" = NULL,
+    "Unscaled_y" = NULL,
+    "scaleType" = NULL,
+    "shape_data_wNA" = NULL,
+    "knn_info" = NULL
+
+  )
 
 
   output$dyn_var_assign <- renderUI({
 
     var_choices <- names(rv$mm_dataset)
 
-    out <- list(
+    var_select_ui <- list(
     selectInput("assign_id",
                 "Choose ID variable",
                 choices = var_choices,
@@ -54,7 +65,7 @@ server <- function(input, output) {
                 selected = var_choices[3])
     )
 
-    out
+    var_select_ui
   })
 
 
@@ -92,7 +103,7 @@ server <- function(input, output) {
     tmp_y <- pull(rv$mm_dataset, !!sym(eval(rv$y_var)))
     tmp_aln <- pull(rv$mm_dataset, !!sym(eval(rv$aln_var)))
 
-    rv$aln_11 <- mm_ArrayData(IDs = tmp_id,
+    aln_11() <- mm_ArrayData(IDs = tmp_id,
                  DAYS = tmp_x,
                  VALUE = tmp_y,
                  MID = tmp_aln,
@@ -100,12 +111,10 @@ server <- function(input, output) {
                  targetMID = input$tar_alignment,
                  transformation = "minmax",
                  impute_missing = input$knn_n
+                 )
 
 
-    )
 
-
-    rv$data_ready <- TRUE
   })
 
 
@@ -128,9 +137,9 @@ server <- function(input, output) {
     # if(!rv$data_ready){
     #   return(NULL)
     # }
-      mm_PlotArray(rv$aln_11$Shape_data, MeanShape = FALSE,lbl = "")
+      mm_PlotArray(aln_11()$Shape_data, MeanShape = FALSE,lbl = "")
 
-      points(rv$aln_11$Shape_data[,,input$ind_pick1], type = "l", col = "green", lwd = 2)
+      points(aln_11()$Shape_data[,,input$ind_pick1], type = "l", col = "green", lwd = 2)
 
 
   })
@@ -140,9 +149,9 @@ server <- function(input, output) {
     # if(!rv$data_ready){
     #   return(NULL)
     # }
-      mm_PlotArray(rv$aln_11$shape_data_wNA,MeanShape = FALSE, lbl = "")
-      points(rv$aln_11$shape_data_wNA[,,input$ind_pick1], pch = 16, col = "dark grey")
-      points(rv$aln_11$Shape_data[,,input$ind_pick1], col = "red")
+      mm_PlotArray(aln_11()$shape_data_wNA,MeanShape = FALSE, lbl = "")
+      points(aln_11()$shape_data_wNA[,,input$ind_pick1], pch = 16, col = "dark grey")
+      points(aln_11()$Shape_data[,,input$ind_pick1], col = "red")
 
 
   })
@@ -154,7 +163,7 @@ server <- function(input, output) {
     # if(!rv$data_ready){
     #   return(NULL)
     # }
-      tmp <- print_summary(rv$aln_11)
+      tmp <- print_summary(aln_11())
       cat(tmp)
 
     })
@@ -164,7 +173,7 @@ server <- function(input, output) {
     # if(!rv$data_ready){
     #   return(NULL)
     # }
-      tmp_tab <- data.frame(table(rv$aln_11$knn_info$nmis))
+      tmp_tab <- data.frame(table(aln_11()$knn_info$nmis))
       names(tmp_tab) <- c("Missing Days", "Frequency")
       tmp_tab
 
@@ -181,7 +190,7 @@ server <- function(input, output) {
     #   return(NULL)
     # }
     #
-    mm_CalcShapespace(rv$aln_11$Shape_data)
+    mm_CalcShapespace(aln_11()$Shape_data)
 })
 
 
@@ -261,7 +270,7 @@ server <- function(input, output) {
     target_x <- selected_coords$x
     target_y <- selected_coords$y
 
-    out <- mm_coords_to_shape(A = rv$aln_11$Shape_data,
+    out <- mm_coords_to_shape(A = aln_11()$Shape_data,
                               PCA = rv_pca_full()$PCA,
                               target_PCs = c(input$x_pc,
                                              input$y_pc),
@@ -282,7 +291,7 @@ server <- function(input, output) {
       # if(!rv$data_ready){
       #   return(NULL)
       # }
-    mm_PlotArray(rv$aln_11$Shape_data,lbl = "Individual shapes",MeanShape = FALSE)
+    mm_PlotArray(aln_11()$Shape_data,lbl = "Individual shapes",MeanShape = FALSE)
     points(pc_target_shp(), type = "l", col = "green", lwd = 2)
 
   })
@@ -506,7 +515,7 @@ server <- function(input, output) {
     # if(!rv$data_ready){
     #   return(NULL)
     # }
-    sub_aln <- rv$aln_11$Shape_data[,,brush_ind$to_keep]
+    sub_aln <- aln_11()$Shape_data[,,brush_ind$to_keep]
     mm_PlotArray(sub_aln,lbl = "Individual shapes",MeanShape = FALSE)
     tmp_mshp <- apply(sub_aln, c(1,2), mean)
     points(tmp_mshp, type = "l", col = "orange", lwd = 2)
@@ -530,7 +539,7 @@ server <- function(input, output) {
     all_cols <- rainbow(brush_ind$max_k, 0.4, 0.8, alpha = .4)
     m_cols <- rainbow(brush_ind$max_k, 0.8, 0.4)
     for(nn in 1:brush_ind$max_k){
-      mm_PlotArray(rv$aln_11$Shape_data[,,brush_ind$grps==nn], MeanCol = m_cols[nn], AllCols = all_cols[nn],lbl = paste("Group", nn, "of", brush_ind$max_k))
+      mm_PlotArray(aln_11()$Shape_data[,,brush_ind$grps==nn], MeanCol = m_cols[nn], AllCols = all_cols[nn],lbl = paste("Group", nn, "of", brush_ind$max_k))
     }
 
   })

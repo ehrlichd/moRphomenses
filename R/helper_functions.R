@@ -285,5 +285,86 @@ mm_coords_to_shape <- function (A, PCA, target_coords, target_PCs = c(1,2)){
   new_shape <- new_shape + mshp
   new_shape
 
+}
+
+
+
+#' Print basic summary
+#'
+#' @param aln An object created with mm_ArrayData
+#' @param grps (Optional) A numeric vector that defines groupings
+#' @export
+#'
+
+print_summary <- function(aln, grps = NULL){
+
+    if(is.null(grps)){
+      out <- paste(
+        "Summary:", "\n\n",
+      "n-Individuals:", "\n",
+      dim(aln$Shape_data)[[3]], "\n\n",
+
+      "Mean (sd) X", "\n",
+      paste0(
+        round(mean(aln$Size_data$size_x),2), " +/- (",
+        round(sd(aln$Size_data$size_x),2), ")"
+      ),
+      "\n\n",
+
+      "Mean (sd) Y",
+      "\n",
+      paste0(
+        round(mean(aln$Size_data$size_y),2), " +/- (",
+        round(sd(aln$Size_data$size_y),2), ")"
+      ),
+      "\n\n",
+
+      "Mean (sd) Error (dist to mean)",
+      "\n",
+      paste(
+        round(mean(aln$knn_info$error),2), "+/- (",
+        round(sd(aln$knn_info$error),2), ")"
+      )
+    )
+
+  } else {
+    uu_grps <- unique(grps)
+
+    out <- vector(mode = "list", length = length(uu_grps))
+
+    for(ii in seq_along(uu_grps)){
+
+      out[[ii]] <- paste(
+        "Summary:", "\n\n",
+        "n Individuals:", "\n",
+        dim(aln$Shape_data)[[3]][grps == uu_grps[i]], "\n\n",
+
+        "Mean (sd) X", "\n",
+        paste0(
+          round(mean(aln$Size_data$size_x[grps == uu_grps[i]]),2), " +/- (",
+          round(sd(aln$Size_data$size_x[grps == uu_grps[i]]),2), ")"
+        ),
+        "\n\n",
+
+        "Mean (sd) Y", "\n",
+        paste0(
+          round(mean(
+            aln$Size_data$size_y[grps == uu_grps[i]]),2)," +/- (",
+          round(sd(
+            aln$Size_data$size_y[grps == uu_grps[i]]),2), ")"
+        ), "\n\n",
+
+        "Mean (sd) Error (dist to mean)",
+        "\n",
+        paste(
+          round(mean(aln$knn_info$error[grps == uu_grps[i]]),2), "+/- (",
+          round(sd(aln$knn_info$error[grps == uu_grps[i]]),2), ")"
+        )
+      )
+
+    }
+
   }
+
+}
 

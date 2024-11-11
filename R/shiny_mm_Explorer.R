@@ -11,18 +11,11 @@
 
 #' Launch mm_Explorer
 #'
-#' @param dataset The dataset to be analyzed
 #' @export
 
-mm_Explorer <- function(dataset=NULL){
-  if(is.null(dataset)){
-    dataset <- mm_data
-  }
+mm_Explorer <- function(){
 
-  ## I don't expect this to work, but give it a try...otherwise,
-  ## CUT AND PASTE THE FINAL VERSION FROM app.R
-
-  runApp(appDir = system.file("app.R", package = "moRphomenses"))
+  runApp(appDir = system.file("mm_Explorer", package = "moRphomenses"))
 
 
 }

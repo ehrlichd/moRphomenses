@@ -4,10 +4,7 @@
 \alias{mm_Explorer}
 \title{Launch mm_Explorer}
 \usage{
-mm_Explorer(dataset = NULL)
-}
-\arguments{
-\item{dataset}{The dataset to be analyzed}
+mm_Explorer()
 }
 \description{
 Launch mm_Explorer

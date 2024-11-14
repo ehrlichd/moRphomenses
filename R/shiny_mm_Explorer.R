@@ -23,7 +23,9 @@ mm_Explorer <- function(){
 
   # ## system.file not finding the file
   # ## This appears to work if
-  shiny::runApp(appDir = system.file("mm_Explorer", package = "moRphomenses"))
+  app_dir <- system.file("mm_Explorer", package = "moRphomenses")
+
+  shiny::runApp(app_dir, launch.browser = TRUE,display.mode = "normal")
 
 
 }

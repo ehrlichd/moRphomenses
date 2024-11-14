@@ -15,7 +15,15 @@
 
 mm_Explorer <- function(){
 
-  runApp(appDir = system.file("mm_Explorer", package = "moRphomenses"))
+  requireNamespace("shiny", quietly = TRUE)
+
+  # app <- shiny::shinyApp(ui = ui, server = server)
+  #
+  # shiny::runApp(app)
+
+  # ## system.file not finding the file
+  # ## This appears to work if
+  shiny::runApp(appDir = system.file("mm_Explorer", package = "moRphomenses"))
 
 
 }

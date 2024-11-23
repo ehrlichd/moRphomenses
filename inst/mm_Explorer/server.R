@@ -130,6 +130,7 @@ function(input, output, session) {
 
   })
 
+
   output$aln_scl <- renderPlot({
     if(!rv$data_ready){
       return()
@@ -470,6 +471,17 @@ function(input, output, session) {
     })
 
 
+  output$all_shp1 <- renderPlot({
+    if(!rv$data_ready){
+      return()
+    }
+    mm_PlotArray(aln_11()$Shape_data,
+                 MeanShape = TRUE,
+                 lbl = "Whole Sample")
+
+  })
+
+
   ### Render dendro_plot -------------------------------
   output$dendro_plot <- renderPlot({
     if(!rv$data_ready){
@@ -480,8 +492,9 @@ function(input, output, session) {
 
     par("mar" = c(0,2,0,0))
     plot(tmp_TREE)
-    points(brush_ind$in_nodes, col = "orange")
-    points(brush_ind$out_nodes, col = "green")
+    points(brush_ind$in_nodes, col = "black", cex = 1.2, pch = 16)
+    points(brush_ind$in_nodes, col = "orange", cex = 1.1, pch = 16)
+    points(brush_ind$out_nodes, col = "yellow", cex = 1.1, pch = 16)
     points(tmp_inds, col = brush_ind$leaf_cols, pch = 16)
 
   })
@@ -534,10 +547,10 @@ function(input, output, session) {
     brush_ind$to_keep <- select_inds_xy[order.dendrogram(rv_diagnostics()$TREE)]
 
     brush_ind$in_nodes <- all_nodes_xy()[((all_nodes_xy()[, 1] < input$inds$xmax) &
-                                            (all_nodes_xy()[, 1] > input$inds$xmin)) & all_nodes_xy()[, 2] > 0, ]
+                                            (all_nodes_xy()[, 1] > input$inds$xmin)) & all_nodes_xy()[, 2] == 0, ]
 
     brush_ind$out_nodes <- all_nodes_xy()[!((all_nodes_xy()[, 1] < input$inds$xmax) &
-                                              (all_nodes_xy()[, 1] > input$inds$xmin)) & all_nodes_xy()[, 2] > 0, ]
+                                              (all_nodes_xy()[, 1] > input$inds$xmin)) & all_nodes_xy()[, 2] == 0, ]
 
   })
 
@@ -549,7 +562,7 @@ function(input, output, session) {
       return()
     }
     sub_aln <- aln_11()$Shape_data[, , brush_ind$to_keep]
-    mm_PlotArray(sub_aln, lbl = "Individual shapes", MeanShape = FALSE)
+    mm_PlotArray(sub_aln, lbl = "Selected Group", MeanShape = FALSE)
     tmp_mshp <- apply(sub_aln, c(1, 2), mean)
     points(tmp_mshp,
            type = "l",
@@ -565,9 +578,9 @@ function(input, output, session) {
   output$phenotypes <- renderPlot(height = reactive(200 * brush_ind$max_k),
                                   width = 600,
                                   {
-                                    # if(!rv$data_ready){
-                                    #   return(NULL)
-                                    # }
+                                    if(!rv$data_ready){
+                                      return(NULL)
+                                    }
                                     layout(matrix(1:brush_ind$max_k, ncol = 1))
 
                                     all_cols <- rainbow(brush_ind$max_k, 0.4, 0.8, alpha = .4)
@@ -582,6 +595,17 @@ function(input, output, session) {
                                     }
 
                                   })
+
+
+  output$pheno_summary <- renderPrint({
+    if(!rv$data_ready){
+      return()
+    }
+
+      pheno_summary <- print_summary(aln_11(), grps = brush_ind$grps)
+    cat(pheno_summary)
+
+  })
 
 
   # Debug ------------------------------------

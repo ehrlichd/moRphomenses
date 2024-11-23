@@ -7,10 +7,10 @@ library(shiny)
 library(dplyr)
 library(moRphomenses)
 
-pc_shape_height <- 78
+pc_shape_height <- 100
 ind_shape_height <- 156
 
-pc_pad <- 40
+pc_pad <- 50
 
 
 
@@ -91,11 +91,22 @@ tabPanel("Alignment", sidebarLayout(
       )),
 
     fluidRow(
+      column(width = 6,
+             ## Explanotory text of the above plot
+             "Selected individual is highlighted in green."
+      ),
+      column(width = 6,
+             ## explanotry text of missing data
+             "Selected individual is highlighted in red circles. Empty circles indicate the imputed value for missing data for that indivdual. Data imputation based on k-nearest neighbors."
+             )
+    ),
+
+    fluidRow(
       column(
-        width = 8,
+        width = 6,
         verbatimTextOutput("aln_summary")),
       column(
-        width = 8,
+        width = 6,
         "n-missing data (across individuals):",
         tableOutput("n_miss_summary")
     )
@@ -208,11 +219,11 @@ tabPanel("Subgroups", sidebarLayout(
 
     uiOutput("dyn_k_grps"),
 
-    radioButtons(
-      "cluster_type",
-      label = "Clustering Algorithm:",
-      choices = c("Hierarchical", "k-means")
-    ),
+    # radioButtons(
+    #   "cluster_type",
+    #   label = "Clustering Algorithm:",
+    #   choices = c("Hierarchical", "k-means")
+    # ),
     checkboxInput("show_diagnostics", "Show Diagnostic Plots")
 
   ),
@@ -223,13 +234,29 @@ tabPanel("Subgroups", sidebarLayout(
       width = 6,
       plotOutput("dendro_plot",
                  height = ind_shape_height*2,
-                 click = "cut",
+                 dblclick = "cut",
                  brush = "inds")),
     column(
       width = 6,
+      fluidRow(
+      plotOutput("all_shp1",
+                 height = ind_shape_height),
       plotOutput("tree_shp",
-                 height = ind_shape_height)) ## close RH
+                 height = ind_shape_height))
+    )
   ), ## close row
+  fluidRow(
+    column(width = 6,
+           "Dendrogram using Ward's clustering to visualize multivaraite relationships of PC scores. Individuals reprepsented by points across the bottom. Smaller branches represent more similar individuals. Use the controls at the left to split the dendrogram into k-clusters, represented by the plot color."
+           ),
+    column(width = 6,
+           "Top, individual profiles amd mean for whole mean.",
+           "<br>",
+           "Bottom, individual profiles and mean for selected sub-set. Click and drag on the dendrogram to select a subset of individuals to visualize above. Selected individuals are highlted in orange above and on the dendrogram."
+           )
+
+  ),
+
 
   ## diagnostics row
   fluidRow(
@@ -256,6 +283,7 @@ tabPanel(
         column(width = 10,
           plotOutput("phenotypes")),
         column(width = 2,
+               verbatimTextOutput("pheno_summary")
                ## display summary info for each group
                #### n sample for each subgroup
                #### avg + sd of x and y vals

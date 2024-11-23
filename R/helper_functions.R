@@ -341,24 +341,24 @@ print_summary <- function(aln, grps = NULL){
 
         "Mean (sd) X", "\n",
         paste0(
-          round(mean(aln$Size_data$size_x[grps == uu_grps[i]]),2), " +/- (",
-          round(sd(aln$Size_data$size_x[grps == uu_grps[i]]),2), ")"
+          round(mean(aln$Size_data$size_x[grps == uu_grps[ii]]),2), " +/- (",
+          round(sd(aln$Size_data$size_x[grps == uu_grps[ii]]),2), ")"
         ),
         "\n\n",
 
         "Mean (sd) Y", "\n",
         paste0(
           round(mean(
-            aln$Size_data$size_y[grps == uu_grps[i]]),2)," +/- (",
+            aln$Size_data$size_y[grps == uu_grps[ii]]),2)," +/- (",
           round(sd(
-            aln$Size_data$size_y[grps == uu_grps[i]]),2), ")"
+            aln$Size_data$size_y[grps == uu_grps[ii]]),2), ")"
         ), "\n\n",
 
         "Mean (sd) Error (dist to mean)",
         "\n",
         paste(
-          round(mean(aln$knn_info$error[grps == uu_grps[i]]),2), "+/- (",
-          round(sd(aln$knn_info$error[grps == uu_grps[i]]),2), ")"
+          round(mean(aln$knn_info$error[grps == uu_grps[ii]]),2), "+/- (",
+          round(sd(aln$knn_info$error[grps == uu_grps[ii]]),2), ")"
         )
       )
 

@@ -28,3 +28,26 @@ aln_11 <-  mm_ArrayData(IDs = rv$mm_dataset %>%
                         impute_missing = input$knn_n
 
 )
+
+
+rv_diagnostics <- mm_Diagnostics(aln_11$Shape_data)
+new_groups <- dendextend::cutree(rv_diagnostics$TREE, k = 3)
+
+brush_ind <- list(
+  "grps" = new_groups
+)
+
+
+debugonce(print_summary)
+
+test <- print_summary(aln_11, grps = brush_ind$grps)
+
+lapply(test, function(x){
+  if(!is.null(x)){
+    cat(x)
+  }
+})
+
+
+test[[1]]
+names(test) <- c("a", "b", "c")

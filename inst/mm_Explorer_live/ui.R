@@ -21,15 +21,15 @@ titlePanel("mm Explorer"),
 
 # tabset layout ---------------------------
 tabsetPanel(
-# tab Load Data --------------------------
-tabPanel("Load Data", sidebarLayout(
-  sidebarPanel(width = 2, fileInput("file_select", "Choose data file")),
-  ## close SB
-  mainPanel(
-    actionButton("go", "Analyze!"),
-    uiOutput("dyn_var_assign")
-    ) ## close MP
-)), ## close sbpLayout; close tab
+# # tab Load Data --------------------------
+# tabPanel("Load Data", sidebarLayout(
+#   sidebarPanel(width = 2, fileInput("file_select", "Choose data file")),
+#   ## close SB
+#   mainPanel(
+#     actionButton("go", "Analyze!"),
+#     uiOutput("dyn_var_assign")
+#     ) ## close MP
+# )), ## close sbpLayout; close tab
 
 # tab alignment -------------------------
 tabPanel("Alignment", sidebarLayout(
@@ -280,9 +280,9 @@ tabPanel(
       ),
     mainPanel(
       fluidRow(
-        column(width = 10,
+        column(width = 8,
           plotOutput("phenotypes")),
-        column(width = 2,
+        column(width = 4,
                verbatimTextOutput("pheno_summary")
                ## display summary info for each group
                #### n sample for each subgroup

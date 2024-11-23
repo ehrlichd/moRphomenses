@@ -252,7 +252,22 @@ function(input, output, session) {
       ##### text(rep(0, 5), yax, labels = round(yax),cex = 1, col = "red",pos = 4)
       ##### text(xax, rep(0, 5), labels = round(xax),cex = 1, col = "blue", pos = 1)
 
-      #### add the points
+#
+#       if(input$k_grps > 1){
+#         set.seed(13)
+#         tmp_grps <- kmeans(rv_pca_select(),centers = brush_ind$max_k)
+#         cols <- rainbow(brush_ind$max_k)
+#         for(gg in 1:brush_ind$max_k){
+#           points(rv_pca_select()[tmp_grps$cluster == gg,],
+#                  pch = 16,
+#                  col = mm_mute_cols(cols[gg])
+#                  )
+#         }
+#       } else {
+#         #### add the points
+#         points(rv_pca_select(), pch = 16, col = mm_mute_cols("black"))
+#       }
+
       points(rv_pca_select(), pch = 16, col = mm_mute_cols("black"))
 
       ## add target
@@ -439,8 +454,7 @@ function(input, output, session) {
       label = "Subgroups to visualize:",
       value = brush_ind$max_k,
       min = 1,
-      max = 25,
-      width = "25%"
+      max = 25
     )
 
   })
@@ -602,8 +616,8 @@ function(input, output, session) {
       return()
     }
 
-      pheno_summary <- print_summary(aln_11(), grps = brush_ind$grps)
-    cat(pheno_summary)
+      pheno_summary <- print_summary(aln_11(), brush_ind$grps)
+    lapply(pheno_summary, cat)
 
   })
 

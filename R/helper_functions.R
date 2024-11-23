@@ -335,36 +335,36 @@ print_summary <- function(aln, grps = NULL){
     for(ii in seq_along(uu_grps)){
 
       out[[ii]] <- paste(
-        "Summary:", "\n\n",
-        "n Individuals:", "\n",
-        dim(aln$Shape_data)[[3]][grps == uu_grps[i]], "\n\n",
+        paste0("Group",ii), "\n",
+        "n Individuals:", "\n","  ",
+        dim(aln$Shape_data[,,grps == uu_grps[ii]])[[3]], "\n",
 
-        "Mean (sd) X", "\n",
+        "Mean (sd) X", "\n", "  ",
         paste0(
           round(mean(aln$Size_data$size_x[grps == uu_grps[ii]]),2), " +/- (",
           round(sd(aln$Size_data$size_x[grps == uu_grps[ii]]),2), ")"
         ),
-        "\n\n",
+        "\n",
 
-        "Mean (sd) Y", "\n",
+        "Mean (sd) Y", "\n", "  ",
         paste0(
           round(mean(
             aln$Size_data$size_y[grps == uu_grps[ii]]),2)," +/- (",
           round(sd(
             aln$Size_data$size_y[grps == uu_grps[ii]]),2), ")"
-        ), "\n\n",
+        ), "\n",
 
-        "Mean (sd) Error (dist to mean)",
-        "\n",
+        "Mean (sd) Error (dist to mean)", "\n", "  ",
         paste(
           round(mean(aln$knn_info$error[grps == uu_grps[ii]]),2), "+/- (",
           round(sd(aln$knn_info$error[grps == uu_grps[ii]]),2), ")"
-        )
+        ), "\n\n\n"
       )
 
     }
 
   }
+
   out
 
 }

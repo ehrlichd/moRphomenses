@@ -1,8 +1,8 @@
 Package: moRphomenses
 Title: Align, Scale, and Visualize "Shape" of Menstrual Cycle Hormones
-Version: 0.0.0.9000
+Version: 1.0.0.9000
 Authors@R: 
-    person("Daniel", "Ehrlich", , "dan.ehrlich.e@gmail.com", role = c("aut", "cre"))
+    person("Daniel", "Ehrlich", "dan.ehrlich.e@gmail.com", role = c("aut", "cre"))
 Description: Geometric Morphometric based methods to study the
     shape/phenotype of hormone concentrations across the menstrual cycle.
 License: GPL (>= 3.0)

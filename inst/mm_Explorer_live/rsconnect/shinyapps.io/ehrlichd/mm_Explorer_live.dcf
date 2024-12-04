@@ -5,6 +5,6 @@ account: ehrlichd
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 13433492
-bundleId: 9427539
+bundleId: 9461838
 url: https://ehrlichd.shinyapps.io/mm_Explorer_live/
 version: 1

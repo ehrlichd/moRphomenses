@@ -1,0 +1,10 @@
+name: mm_Explorer_live
+title: mm_Explorer_live
+username: ehrlichd
+account: ehrlichd
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13433492
+bundleId: 9427539
+url: https://ehrlichd.shinyapps.io/mm_Explorer_live/
+version: 1

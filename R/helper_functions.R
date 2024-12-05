@@ -260,8 +260,8 @@ mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
 #'  Visualize shape of target coordinates
 #'
 #' @param A A landmark array used for the pca
-#' @param coords A single set of X,Y coordinates.
 #' @param PCA output of prcomp. Should contain $transormation
+#' @param target_coords A single set of X,Y coordinates.
 #' @param target_PCs Integer identifying which pc to use on the X and Y axis. Default is c(1,2) for PC1 on x and PC2 on y
 #' @export
 #'

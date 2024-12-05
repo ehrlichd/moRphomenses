@@ -11,9 +11,9 @@ mm_coords_to_shape(A, PCA, target_coords, target_PCs = c(1, 2))
 
 \item{PCA}{output of prcomp. Should contain $transormation}
 
-\item{target_PCs}{Integer identifying which pc to use on the X and Y axis. Default is c(1,2) for PC1 on x and PC2 on y}
+\item{target_coords}{A single set of X,Y coordinates.}
 
-\item{coords}{A single set of X,Y coordinates.}
+\item{target_PCs}{Integer identifying which pc to use on the X and Y axis. Default is c(1,2) for PC1 on x and PC2 on y}
 }
 \description{
 Visualize shape of target coordinates

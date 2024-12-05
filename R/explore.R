@@ -88,6 +88,7 @@ mm_CalcShapespace <- function(dat, max_Shapes = 10){
 #' @param max_PC_viz Maximum number of PCs to include in visualizations (EG Eigenplots, or shape trends.
 #' @param max_PC_calc By default (NULL), all PCs will be included in calculations. However, if fewer PCs are required users may specify an integer, n, to get the first n PCS.
 #' @param hide_plots By default (FALSE), helpful visuals are plotted.
+#'
 #' @export
 #'
 mm_Diagnostics <- function(dat, max_PC_viz=10, max_PC_calc=NULL, hide_plots = FALSE){

@@ -31,6 +31,11 @@ tabsetPanel(
 #     ) ## close MP
 # )), ## close sbpLayout; close tab
 
+
+tabPanel("Introduction",
+
+         ),
+
 # tab alignment -------------------------
 tabPanel("Alignment", sidebarLayout(
   sidebarPanel(
@@ -139,6 +144,9 @@ tabPanel("Shapespace", sidebarLayout(
   ## close SB
 
   mainPanel(## PC shapes and scatter ---------------------------------
+
+            ## switch this entire plot to a renderUI
+            ## include an if/else that checks the output window size
             fluidRow(
               ## entire shapespace plot
               column(
@@ -158,7 +166,7 @@ tabPanel("Shapespace", sidebarLayout(
                 ## mid row
 
                 fluidRow(
-                  column(width = 4, fluidRow(plotOutput("pad", height = pc_pad)), fluidRow(
+                  column(width = 4, fluidRow(plotOutput("pad_l", height = pc_pad)), fluidRow(
                     plotOutput("pc_x_min", height = pc_shape_height, width = pc_shape_height *
                                  2)
                   )),
@@ -173,7 +181,7 @@ tabPanel("Shapespace", sidebarLayout(
                     )
                   ),
 
-                  column(width = 4, fluidRow(plotOutput("pad", height = pc_pad)), fluidRow(
+                  column(width = 4, fluidRow(plotOutput("pad_r", height = pc_pad)), fluidRow(
                     plotOutput("pc_x_max", height = pc_shape_height, width = pc_shape_height *
                                  2)
                   ))

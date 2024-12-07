@@ -5,7 +5,7 @@ Authors@R: person(given = "Daniel", family = "Ehrlich", email = "dan.ehrlich.e@g
 Description: Tools that make it easy to apply geometric morphometric principles 
     to the study of hormone profiles. Easily transform daily measures into multivariate
     landmark-based data. Includes custom functions to apply multivariate methods
-    for data exploration as well as hypothesis testing. Also includes shiny webapp
+    for data exploration as well as hypothesis testing. Also includes shiny web app
     to streamline data exploration. Developed to study menstrual cycle hormones but
     should be applicable to any biomarker over any time period.
 License: GPL (>= 3.0)

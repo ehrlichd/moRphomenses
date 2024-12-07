@@ -12,9 +12,12 @@
 #' @import graphics
 #' @import grDevices
 #' @import utils
-#' @import dendextend
-#' @import geomorph
-#'
+#' @importFrom dendextend labels_colors
+#' @importFrom dendextend place_labels
+#' @importFrom dendextend cutree
+#' @importFrom geomorph geomorph.data.frame
+#' @importFrom geomorph procD.lm
+#' @importFrom geomorph shape.predictor
 #'
 #'
 #'

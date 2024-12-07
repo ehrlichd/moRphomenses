@@ -17,7 +17,6 @@ Create a sequence from -1:1 of specified length. MIDpoint (day0) can be
 \examples{
 mm_get_interval(15) ## Symmetrical sequence from -1 to 1 with 0 in the middle.
 mm_get_interval(15, day0 = 8) ## The same sequence, explicitly specifying the midpoint
-
 mm_get_interval(15, day0 = 3) ## 15 divisions with an asymmetric distribution.
 
 }

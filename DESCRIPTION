@@ -1,6 +1,6 @@
 Package: moRphomenses
 Title: Align, Scale, and Visualize "Shape" of Menstrual Cycle Hormones
-Version: 1.0.0.9001
+Version: 1.0.0.9002
 Authors@R: person(given = "Daniel", family = "Ehrlich", email = "dan.ehrlich.e@gmail.com", role = c("aut", "cre"))
 Description: Tools that make it easy to apply geometric morphometric principles 
     to the study of hormone profiles. Easily transform daily measures into multivariate

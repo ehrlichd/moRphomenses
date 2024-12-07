@@ -7,17 +7,10 @@
 #'
 #' @description Analyze shapes/phenotypes of hormone data using Geometric Morphometric inspired methods.
 #'
-#'
+#' @import stats
 #' @import graphics
 #' @import grDevices
 #' @import utils
-#' @importFrom cluster pam
-#' @importFrom dendextend labels_colors
-#' @importFrom dendextend place_labels
-#' @importFrom dendextend cutree
-#' @importFrom geomorph geomorph.data.frame
-#' @importFrom geomorph procD.lm
-#' @importFrom geomorph shape.predictor
 #'
 #'
 #'

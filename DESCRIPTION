@@ -1,5 +1,5 @@
 Package: moRphomenses
-Title: Geometric Morphometric tools to Align, Scale, and Compare "Shape" of Menstrual Cycle Hormones
+Title: Geometric Morphometric Tools to Align, Scale, and Compare "Shape" of Menstrual Cycle Hormones
 Version: 1.0.0.9004
 Authors@R: person(given = "Daniel", family = "Ehrlich", email = "dan.ehrlich.e@gmail.com", role = c("aut", "cre"))
 Description: Tools that make it easy to apply geometric morphometric principles 
@@ -13,12 +13,16 @@ URL: <https://github.com/ClancyLabUIUC/moRphomenses>
 Depends: 
     R (>= 2.10)
 Imports: 
-    cluster,
-    dendextend,
-    geomorph
+    stats,
+    graphics,
+    grDevices,
+    utils
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
+    dendextend,
+    geomorph,
+    cluster,
     shiny

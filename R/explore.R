@@ -7,7 +7,7 @@
 #'
 #' @param dat A 3D array of shape data to be analyzed.
 #' @param max_Shapes The maximum amount of PCs to visualize. Default 10.
-#'
+#' @return A list containing the results of shape-pca, including vizualizations of shape extrema for each Principal Component.
 #' @export
 #'
 
@@ -80,7 +80,11 @@ mm_CalcShapespace <- function(dat, max_Shapes = 10){
 
 }
 
-#' Run a suite of diagnostic analysis/plots
+#' Run a suite of diagnostic analyses.
+#'
+#' Conduct a set of analyses to make shape-PCA results easier to interpret.
+#' Specifically, this will provide a table of eigen values (optional barplot), provide 5-number summary across each PC, conduct a naive Ward's clustering of PC scores (optional dendrogram, along with silhouette plot and scree plot of individual
+#' distance to the sample mean
 #'
 #'
 #'
@@ -88,7 +92,11 @@ mm_CalcShapespace <- function(dat, max_Shapes = 10){
 #' @param max_PC_viz Maximum number of PCs to include in visualizations (EG Eigenplots, or shape trends.
 #' @param max_PC_calc By default (NULL), all PCs will be included in calculations. However, if fewer PCs are required users may specify an integer, n, to get the first n PCS.
 #' @param hide_plots By default (FALSE), helpful visuals are plotted.
-#'
+#' @return Returns a list containing the results of:
+#' \itemize{
+#' \item eigs - A table containing individual and cumulutive loadings for each PC
+#' \item PC_5_num - A data.frame containing the fivenum summary for each PC
+#' \item TREE - A dendrogram representing the results of a naive-Ward's clustering}
 #' @export
 #'
 mm_Diagnostics <- function(dat, max_PC_viz=10, max_PC_calc=NULL, hide_plots = FALSE){

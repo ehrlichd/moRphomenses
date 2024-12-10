@@ -262,6 +262,7 @@ mm_ArrayData <-
 #' @name mm_FillMissing
 #' @param A A ragged array (IE, contains missing cells), presumably constructed with \code{\link{mm_ArrayData}}.
 #' @param knn Number of nearest neighbors to draw on for imputation (default = 3).
+#' @return Returns an array of the same dimensions with all missing data filled.
 #'
 #' @export
 #'
@@ -320,8 +321,9 @@ mm_FillMissing <- function(A,
 #'
 #' Create a sequence from -1:1 of specified length. MIDpoint (day0) can be
 #' @name mm_get_interval
-#' @param days The number of days(divisions) fit between -1 and 1 (inclusive)
-#' @param day0 If NULL (default), the median integer will be calculated. This produces symmetrical ranges when days = odd number. Can be specified for asymmetric ranges.
+#' @param days The length of the sequence to return, inclusive of the endpoints (-1,1)
+#' @param day0 If NULL (default), the median integer will be calculated, centering the range on 0. Specifying a value will set 0 to that value, creating asymmetric ranges.
+#' @return Returns a numeric vector of specified length, ranging from -1 to 1
 #'
 #' @examples
 #' mm_get_interval(15) ## Symmetrical sequence from -1 to 1 with 0 in the middle.
@@ -382,6 +384,8 @@ mm_transf_minmax <- function(x){
 #'
 #' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
 #'
+#' @return Returns a scaled vector
+#'
 #' @examples
 #' mm_transf_geom(1:10)
 #' @export
@@ -398,6 +402,7 @@ mm_transf_geom <- function(x){
 #'
 #' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
 #'
+#' @return Returns a scaled vector
 #' @examples
 #' mm_transf_zscore(1:10)
 #' @export
@@ -414,6 +419,7 @@ mm_transf_zscore <- function(x){
 #'
 #' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
 #'
+#' @return Returns a scaled vector
 #' @examples
 #' mm_transf_log(1:10)
 #' @export
@@ -430,6 +436,7 @@ mm_transf_log <- function(x){
 #'
 #' @param x A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.
 #'
+#' @return Returns a scaled vector
 #' @examples
 #' mm_transf_log10(1:10)
 #' @export

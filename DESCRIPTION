@@ -9,9 +9,9 @@ Description: Mitteroecker & Gunz (2009) <doi:10.1007/s11692-009-9055-x> describe
     as outlined in Ehrlich et al (2021) <doi:10.1002/ajpa.24514>. Easily transform 
     daily measures into multivariate landmark-based data. Includes custom functions 
     to apply multivariate methods for data exploration as well as hypothesis testing. 
-    Also includes shiny web app to streamline data exploration. Developed to study 
-    menstrual cycle hormones but should be applicable to any biomarker over any 
-    time period.
+    Also includes 'shiny' web app to streamline data exploration. Developed to study 
+    menstrual cycle hormones but functions have been generalized and should be 
+    applicable to any biomarker over any time period.
 License: GPL (>= 3.0)
 URL: <https://github.com/ClancyLabUIUC/moRphomenses>
 Depends: 

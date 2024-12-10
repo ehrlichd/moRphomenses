@@ -93,6 +93,7 @@ mm_CalcShapespace <- function(dat, max_Shapes = 10){
 #'
 mm_Diagnostics <- function(dat, max_PC_viz=10, max_PC_calc=NULL, hide_plots = FALSE){
 
+  on.exit(layout(matrix(1)))
 
   out <- list()
   ## check if array or already PCA
@@ -320,6 +321,8 @@ mm_CheckImputation <- function(A1, A2, ObO = TRUE){
     stop("Arrays must match")
   }
 
+  on.exit(layout(matrix(1)))
+
   n <- dim(A1)[[3]]
 
   lbl <- character(n)
@@ -379,6 +382,9 @@ mm_PlotArray <- function(A,
                          lbl = NULL,
                          yr = NULL,
                          axis_labels = FALSE){
+
+  oldpar <- par(no.readonly = TRUE) ## get orig parameters
+  on.exit(par(oldpar)) ## ensure old par is reset on exit
 
   ## default to lines
   if(identical(plot_type, c("lines", "points"))){
@@ -489,6 +495,10 @@ mm_PlotArray <- function(A,
 
 mm_grps_PlotArray <- function(A, grps){
 
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(layout(matrix(1)))
+  on.exit(par(oldpar),add = TRUE)
+
   k <- length(levels(as.factor(grps)))
 
   cols <- rainbow(k, s= .4, v = 1)
@@ -509,7 +519,7 @@ mm_grps_PlotArray <- function(A, grps){
   for(q in 1:k){
     mm_PlotArray(A=A[,,grps==q],AllCols = cols[q], MeanCol = mcols[q], plot_type = "lines", lbl = paste("g",q,sep=""), yr = range(A[,2,],na.rm = T))
   }
-  layout(matrix(1))
+
 }
 
 
@@ -533,6 +543,10 @@ mm_grps_PlotArray <- function(A, grps){
 #'
 #'
 mm_pretty_pca <- function(PCA, xPC=1, yPC=2, clas_col = NULL, legend_cex = .8) {
+
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(layout(matrix(1)))
+  on.exit(par(oldpar),add = TRUE)
 
   out <- list()
   if (!class(PCA) %in% c("prcomp", "mmPCA")) {
@@ -716,7 +730,6 @@ mm_pretty_pca <- function(PCA, xPC=1, yPC=2, clas_col = NULL, legend_cex = .8) {
   }
 
 
-  layout(matrix(1))
 }
 
 
@@ -742,6 +755,11 @@ mm_pretty_pca <- function(PCA, xPC=1, yPC=2, clas_col = NULL, legend_cex = .8) {
 
 
 mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1.1), cols = NULL, title = "", png_dir = NULL){
+
+
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(layout(matrix(1)))
+  on.exit(par(oldpar),add = TRUE)
 
 
   if(!any(class(mmPCA) %in% "mmPCA")){
@@ -880,9 +898,6 @@ mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1.1), cols = NULL
   if(!is.null(png_dir)){
     dev.off()
   }
-
-  layout(matrix(1))
-  par("mar" = c(5.1,4.1,4.1,2.1))
 
 }
 
@@ -1025,6 +1040,10 @@ mm_BuildModel <- function(shape_data, ..., subgrps= NULL, ff1 = NULL, univ_serie
 
 mm_VizModel <- function(dat, clas_col = NULL){
 
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(layout(matrix(1)))
+  on.exit(par(oldpar),add = TRUE)
+
   ## f1 a formula
   ## coords a [p x k x n] matrix of landmark data
   ## covaraites continuous variables to model
@@ -1107,7 +1126,6 @@ mm_VizModel <- function(dat, clas_col = NULL){
   plot(predsX$max, type = "l", lwd = 3, col = hsv(1,.6,1), xlab = "", ylab = "", ylim= c(0,1))
 
 
-  layout(matrix(1))
 
   out$mvlm <- dat
   out$summary <- summary(dat)

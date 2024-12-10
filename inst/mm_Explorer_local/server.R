@@ -217,6 +217,10 @@ function(input, output, session) {
       if(!rv$data_ready){
         return()
       }
+
+      oldpar <- par(no.readonly = TRUE)
+      on.exit(par(oldpar),add = TRUE)
+
       x_r <- range(rv_pca_select()[, 1])
       par("mar" = c(.5, .5, .5, .5))
 
@@ -501,6 +505,9 @@ function(input, output, session) {
     if(!rv$data_ready){
       return()
     }
+    oldpar <- par(no.readonly = TRUE)
+    on.exit(par(oldpar),add = TRUE)
+
     tmp_TREE <-  dendextend::place_labels(rv_diagnostics()$TREE, rep("", 75))
     tmp_inds <- all_inds_xy()
 
@@ -595,6 +602,9 @@ function(input, output, session) {
                                     if(!rv$data_ready){
                                       return(NULL)
                                     }
+
+                                    on.exit(layout(matrix(1)))
+
                                     layout(matrix(1:brush_ind$max_k, ncol = 1))
 
                                     all_cols <- rainbow(brush_ind$max_k, 0.4, 0.8, alpha = .4)

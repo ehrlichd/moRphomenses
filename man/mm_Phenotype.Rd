@@ -25,7 +25,7 @@ If plot_figs=TRUE (Default), plot associated graphs and return a list containing
 output of \code{\link{mm_ArrayData}}
 \item PCA - PC scores, eigenvalues, and shape visualizations, the output of
 \code{\link{mm_CalcShapespace}}
-\itemize TREE - Dendrogram of PC scores, the output of
+\item TREE - Dendrogram of PC scores, the output of
 \code\link{mm_Diagnostics}}
 \item k_grps - If \code{kgrps} is specified, a vector defining group membership
 (as integer); the results of k-means clustering based on PC scores.

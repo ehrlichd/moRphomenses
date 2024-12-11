@@ -203,11 +203,11 @@ mm_Diagnostics <- function(dat, max_PC_viz=10, max_PC_calc=NULL, hide_plots = FA
 #' @return If plot_figs=TRUE (Default), plot associated graphs and return a list containing:
 #' \itemize{
 #'   \item  ALN - an array containing aligned and scaled landmark data, the
-#'     output of \code{\link{mm_ArrayData}}
+#'     output of [mm_ArrayData]
 #'   \item PCA - PC scores, eigenvalues, and shape visualizations, the output of
-#'     \code{\link{mm_CalcShapespace}}
+#'     [mm_CalcShapespace]
 #'   \item TREE - Dendrogram of PC scores, the output of
-#'     \code\link{mm_Diagnostics}}
+#'     [mm_Diagnostics]
 #'   \item k_grps - If `kgrps` is specified, a vector defining group membership
 #'     (as integer); the results of k-means clustering based on PC scores.
 #'   \item cth_grps - If `cth_grps` is specified, a vector defining group

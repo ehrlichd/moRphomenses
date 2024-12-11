@@ -11,6 +11,9 @@ mm_FillMissing(A, knn = 3)
 
 \item{knn}{Number of nearest neighbors to draw on for imputation (default = 3).}
 }
+\value{
+Returns an array of the same dimensions with all missing data filled.
+}
 \description{
 Fill in a ragged away by nearest neighbor imputation
 }

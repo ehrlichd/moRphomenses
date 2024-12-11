@@ -13,6 +13,9 @@ mm_SilPlot(x, maxC = 15, ...)
 
 \item{...}{additional arguments passed to plot}
 }
+\value{
+No value, produces diagnostic plot.
+}
 \description{
 Plot average silhouete widths to evaluate clusters
 }

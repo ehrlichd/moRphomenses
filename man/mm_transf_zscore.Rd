@@ -9,6 +9,9 @@ mm_transf_zscore(x)
 \arguments{
 \item{x}{A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.}
 }
+\value{
+Returns a scaled vector
+}
 \description{
 Calculate and return z-scores given a numeric vector.
 }

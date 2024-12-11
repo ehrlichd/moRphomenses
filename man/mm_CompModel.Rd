@@ -13,6 +13,10 @@ mm_CompModel(mv_results, row_labels = NULL, digits = 4)
 
 \item{digits}{Number of decimal places to round to. Default includes 4 decimal places.}
 }
+\value{
+A list containing the results of the mvlm, visualizations of shape
+trends along the regression line, and the model itself.
+}
 \description{
 Compare key figs (Rsq, p-value, etc) across multiple models.
 }

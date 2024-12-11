@@ -21,17 +21,24 @@ mm_PlotArray(
 
 \item{MeanShape}{Logical. Should the Mean Shape be calculated and plotted}
 
-\item{AllCols}{Either a single color for all individuals, or a vector specifying colors for each individual. If NULL (default) individuals will be plotted in grey}
+\item{AllCols}{Either a single color for all individuals, or a vector
+specifying colors for each individual. If NULL (default) individuals will be plotted in grey}
 
-\item{MeanCol}{A single color for the mean shape. If Null (default) mean shape will be plotted in black}
+\item{MeanCol}{A single color for the mean shape. If Null (default) mean shape
+will be plotted in black}
 
 \item{plot_type}{Should the data be plotted as points or lines.}
 
-\item{lbl}{A title (main =) for the plot. If NULL (default) the name of the array will be used.}
+\item{lbl}{A title (main =) for the plot. If NULL (default) the name of the
+array will be used.}
 
 \item{yr}{Y-range, in the form c(0,100)}
 
-\item{axis_labels}{Should units be printed along the axis. Defaults to FALSE to maximize the profile shape.}
+\item{axis_labels}{Should units be printed along the axis. Defaults to FALSE
+to maximize the profile shape.}
+}
+\value{
+Plot individual(s) profile(s) in the default graphics device.
 }
 \description{
 Plot Array

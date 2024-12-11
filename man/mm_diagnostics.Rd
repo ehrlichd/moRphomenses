@@ -2,7 +2,7 @@
 % Please edit documentation in R/explore.R
 \name{mm_Diagnostics}
 \alias{mm_Diagnostics}
-\title{Run a suite of diagnostic analysis/plots}
+\title{Run a suite of diagnostic analyses.}
 \usage{
 mm_Diagnostics(dat, max_PC_viz = 10, max_PC_calc = NULL, hide_plots = FALSE)
 }
@@ -15,6 +15,16 @@ mm_Diagnostics(dat, max_PC_viz = 10, max_PC_calc = NULL, hide_plots = FALSE)
 
 \item{hide_plots}{By default (FALSE), helpful visuals are plotted.}
 }
+\value{
+Returns a list containing the results of:
+\itemize{
+\item eigs - A table containing individual and cumulutive loadings for each PC
+\item PC_5_num - A data.frame containing the fivenum summary for each PC
+\item TREE - A dendrogram representing the results of a naive-Ward's clustering
+}
+}
 \description{
-Run a suite of diagnostic analysis/plots
+Conduct a set of analyses to make shape-PCA results easier to interpret.
+Specifically, this will provide a table of eigen values (optional barplot), provide 5-number summary across each PC, conduct a naive Ward's clustering of PC scores (optional dendrogram, along with silhouette plot and scree plot of individual
+distance to the sample mean
 }

@@ -11,6 +11,9 @@ mm_grps_PlotArray(A, grps)
 
 \item{grps}{a vector defining group IDs to subset along the 3rd dimension of the array}
 }
+\value{
+Returns no values, produces a series of plots.
+}
 \description{
 Attempts to optimally format a grid of arrays by group
 }

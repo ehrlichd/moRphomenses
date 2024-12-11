@@ -4,15 +4,24 @@
 \alias{mm_CheckImputation}
 \title{Check Imputation}
 \usage{
-mm_CheckImputation(A1, A2, ObO = TRUE)
+mm_CheckImputation(A1, A2, ObO = interactive())
 }
 \arguments{
-\item{A1}{An aligned array, containing missing data (presumably made with  \code{\link{mm_ArrayData}}\verb{$shape_data_wNA}).}
+\item{A1}{An aligned array, containing missing data (presumably made with
+\code{\link{mm_ArrayData}}\verb{$shape_data_wNA}).}
 
-\item{A2}{An aligned and imputed array (presumably made with \code{\link{mm_ArrayData}}\verb{$Shape_data}).}
+\item{A2}{An aligned and imputed array (presumably made with
+\code{\link{mm_ArrayData}}\verb{$Shape_data}).}
 
-\item{ObO}{One-by-One. If TRUE (default), individuals will be plotted one at a time, requiring the user to advance/exit the operation. If FALSE, all plots will be generated at once to be browsed/exported from  the Plot History}
+\item{ObO}{One-by-One. If TRUE (default, in interactive sessions), individuals
+will be plotted one at a time, requiring the user to advance/exit the
+operation. If FALSE, all plots #' will be generated at once to be browsed
+or exported from the \code{Plots} panel.}
+}
+\value{
+A series of plots for each individual in the array. If \code{ObO=TRUE} user
+input is required to advance or exit the plotting.
 }
 \description{
-Plot Raw (alinged) data along side by side with imputed data.
+Plot Raw (aligned) data along side by side with imputed data.
 }

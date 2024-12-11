@@ -94,9 +94,10 @@ mm_CalcShapespace <- function(dat, max_Shapes = 10){
 #' @param hide_plots By default (FALSE), helpful visuals are plotted.
 #' @return Returns a list containing the results of:
 #' \itemize{
-#' \item eigs - A table containing individual and cumulutive loadings for each PC
-#' \item PC_5_num - A data.frame containing the fivenum summary for each PC
-#' \item TREE - A dendrogram representing the results of a naive-Ward's clustering}
+#'   \item eigs - A table containing individual and cumulutive loadings for each PC
+#'   \item PC_5_num - A data.frame containing the fivenum summary for each PC
+#'   \item TREE - A dendrogram representing the results of a naive-Ward's clustering
+#'   }
 #' @export
 #'
 mm_Diagnostics <- function(dat, max_PC_viz=10, max_PC_calc=NULL, hide_plots = FALSE){
@@ -195,10 +196,27 @@ mm_Diagnostics <- function(dat, max_PC_viz=10, max_PC_calc=NULL, hide_plots = FA
 #' Partition sample into clusters, based on information from
 #' @param dat Either an Array of shape data, an mmPCA object, or an mmDiag object.
 #' @param kgrps A non-negative integer of sub-groups to draw. kgrps=1 will provide results for the whole input dat.
-#' @param cuttree_h Optional. Draw clusters by splitting the tree at a given height, h.
+#' @param cuttree_h Optional. Draw clusters by splitting the tree at a given
+#' height, h.
 #' @param cuttree_k Optional. Draw clsuters by splitting the tree into number of branches, k
 #' @param plot_figs Optional. Default = TRUE, plot phenotypes for each set(s) of subgroups.
-#'
+#' @return If plot_figs=TRUE (Default), plot associated graphs and return a list containing:
+#' \itemize{
+#'   \item  ALN - an array containing aligned and scaled landmark data, the
+#'   output of \code{\link{mm_ArrayData}}
+#'   \item PCA - PC scores, eigenvalues, and shape visualizations, the output of
+#'    \code{\link{mm_CalcShapespace}}
+#'   \itemize TREE - Dendrogram of PC scores, the output of
+#'    \code\link{mm_Diagnostics}}
+#'   \item k_grps - If `kgrps` is specified, a vector defining group membership
+#'   (as integer); the results of k-means clustering based on PC scores.
+#'   \item cth_grps - If `cth_grps` is specified, a vector defining group
+#'   membership (as integer); the results of clustering using
+#'   [dendextend::cutree] for a given height.
+#'   \item ctk_grps - If `ctk_grps` is specified, a vector defining group
+#'   membership (as integer); the results of clustering using
+#'   [dendextend::cutree] for a given number of clusters.
+#' }
 #' @export
 #'
 mm_Phenotype <- function(dat, kgrps, cuttree_h=NULL, cuttree_k=NULL, plot_figs=TRUE){
@@ -310,21 +328,25 @@ mm_Phenotype <- function(dat, kgrps, cuttree_h=NULL, cuttree_k=NULL, plot_figs=T
 
 #' Check Imputation
 #'
-#' Plot Raw (alinged) data along side by side with imputed data.
+#' Plot Raw (aligned) data along side by side with imputed data.
 #'
 #'
 #' @name mm_CheckImputation
-#' @param A1 An aligned array, containing missing data (presumably made with  \code{\link{mm_ArrayData}}`$shape_data_wNA`).
-#' @param A2 An aligned and imputed array (presumably made with \code{\link{mm_ArrayData}}`$Shape_data`).
-#' @param ObO One-by-One. If TRUE (default), individuals will be plotted one at a time, requiring the user to advance/exit the operation. If FALSE, all plots will be generated at once to be browsed/exported from  the Plot History
-#'
+#' @param A1 An aligned array, containing missing data (presumably made with
+#'  \code{\link{mm_ArrayData}}`$shape_data_wNA`).
+#' @param A2 An aligned and imputed array (presumably made with
+#'  \code{\link{mm_ArrayData}}`$Shape_data`).
+#' @param ObO One-by-One. If TRUE (default, in interactive sessions), individuals
+#'  will be plotted one at a time, requiring the user to advance/exit the
+#'  operation. If FALSE, all plots #' will be generated at once to be browsed
+#'  or exported from the `Plots` panel.
+#' @return A series of plots for each individual in the array. If `ObO=TRUE` user
+#' input is required to advance or exit the plotting.
 #'
 #'
 #' @export
 #'
-## NEEDS TO BE MODIFIED
-
-mm_CheckImputation <- function(A1, A2, ObO = TRUE){
+mm_CheckImputation <- function(A1, A2, ObO = interactive()){
   if (!identical(dim(A1), dim(A2))){
     stop("Arrays must match")
   }
@@ -342,6 +364,7 @@ mm_CheckImputation <- function(A1, A2, ObO = TRUE){
 
   y1 <- range(A1[,2,], na.rm = T)
   y2 <- range(A2[,2,], na.rm = T)
+
 
   for (i in 1:n){
     layout(matrix(1:2))
@@ -371,12 +394,18 @@ mm_CheckImputation <- function(A1, A2, ObO = TRUE){
 #'
 #' @param A An array to be plotted
 #' @param MeanShape Logical. Should the Mean Shape be calculated and plotted
-#' @param AllCols Either a single color for all individuals, or a vector specifying colors for each individual. If NULL (default) individuals will be plotted in grey
-#' @param MeanCol A single color for the mean shape. If Null (default) mean shape will be plotted in black
+#' @param AllCols Either a single color for all individuals, or a vector
+#'   specifying colors for each individual. If NULL (default) individuals will be plotted in grey
+#' @param MeanCol A single color for the mean shape. If Null (default) mean shape
+#'   will be plotted in black
 #' @param plot_type Should the data be plotted as points or lines.
-#' @param lbl A title (main =) for the plot. If NULL (default) the name of the array will be used.
+#' @param lbl A title (main =) for the plot. If NULL (default) the name of the
+#'   array will be used.
 #' @param yr Y-range, in the form c(0,100)
-#' @param axis_labels Should units be printed along the axis. Defaults to FALSE to maximize the profile shape.
+#' @param axis_labels Should units be printed along the axis. Defaults to FALSE
+#'   to maximize the profile shape.
+#' @return Plot individual(s) profile(s) in the default graphics device.
+#'
 #' @export
 #'
 #'
@@ -499,6 +528,8 @@ mm_PlotArray <- function(A,
 #'
 #' @param A an array to be plotted
 #' @param grps a vector defining group IDs to subset along the 3rd dimension of the array
+#' @return Returns no values, produces a series of plots.
+#'
 #' @export
 
 mm_grps_PlotArray <- function(A, grps){
@@ -546,6 +577,7 @@ mm_grps_PlotArray <- function(A, grps){
 #' @param clas_col A character vector of groupings. Each level will be plotted as a different color.
 #' @param legend_cex A scaling factor to be applied specifically to the legend. Set to NULL for scatterplot only.
 #'
+#' @return Returns no object, plots results of PCA
 #' @export
 #'
 #'
@@ -750,14 +782,19 @@ mm_pretty_pca <- function(PCA, xPC=1, yPC=2, clas_col = NULL, legend_cex = .8) {
 #'
 #' Meant to be a quick diagnostic plot with minimal customization.
 #'
-#' @param mmPCA Output of \code{mm_CalcShapespace}, containing a PCA object with PC shapes
-#' @param xPC The PC to be plotted on the x axis. If yPC is left null, a univariate density distribution will be plotted with min/max shapes.
+#' @param mmPCA Output of \code{mm_CalcShapespace}, containing a PCA object with
+#'  PC shapes
+#' @param xPC The PC to be plotted on the x axis. If yPC is left null, a
+#'   univariate density distribution will be plotted with min/max shapes.
 #' @param yPC The PC to be plotted on the y axis.
 #' @param yr The y-xis range, in the format c(0,1)
 #' @param cols A vector of colors of length n, for use in scatterplot.
 #' @param title To be used for the plot
-#' @param png_dir A file path to a directory in which to save out PNG figures. Names will be automatically assigned based on input PC(s).
-#'
+#' @param png_dir A file path to a directory in which to save out PNG figures.
+#'   Names will be automatically assigned based on input PC(s).
+#' @return Produces a series of plots to visualize PCA analysis. If `png_dir` is
+#'   specified, function will save out `.png` files. Otherwise plots will be
+#'   displayed in the default plot window.
 #' @export
 
 
@@ -918,17 +955,30 @@ mm_VizShapespace <- function(mmPCA, xPC = 1, yPC = 2, yr = c(0,1.1), cols = NULL
 
 #' Build, implement, visualize multivariate linear model.
 #'
-#'Easily evaluate simple model sets (one covariate with up to 2 additional classifiers/covariates). Helpful for exploratory analysis.
+#'Easily evaluate simple model sets (one covariate with up to 2 additional
+#'  classifiers/covariates). Helpful for exploratory analysis. For detailed
+#'  models or specific combinations of variables, see [geomorph::procD.lm]
+#'  for full use of this function.
 #'
-#' For detailed model or specific combinations of variables, see geomorph::procDlm for full use of this function.
+#' @param shape_data This will be the (multivariate) response variable
+#' @param ... Covariate(s)/classifier(s) to build a model set. Individual models
+#' are run with interaction effects.
+#' @param subgrps Optional. Vector of group membership. Model sets will be run
+#' across the whole sample and subgroups. If k is specified, only the full
+#' model will be run.
+#' @param ff1 An explicit model to test in the format: " coords ~ ...". Names
+#' must match those specifed in `...`. Standard lm notation applies.
+#' @param univ_series Default (FALSE) will evaluate multiple covariates and their
+#'  interaction in a single model. However, it can be helpful to understand the
+#'  univariate effects in isolation of interaction/confounding factors. Set
+#'  `univ_series=TRUE` to produce a series of model sets, one for each covariate
+#'   specified (NOTE: ff1 must also be NULL for this to work).
 #'
-#'@param shape_data This will be the (multivariate) response variable
-#'@param ... Covariate(s)/classifier(s) to build a model set. Indvidual models are run (with interaction).
-#'@param subgrps Optional. Vector of group membership. Model sets will be run across the whole sample and subgroups. If k is specified, only the full model will be run.
-#'@param ff1 An explicit model to test in the format: " coords ~ ...". Names must match those specifed in `...`. Standard lm notation applies.
-#'@param univ_series Default (FALSE) will evaluate multiple covariates and their interaction in a single model. However, it can be helpful to understand the univariate effects in isolation of interation/confounding factors. Set univ_series to TRUE to produce a series of model sets, one for each covariate specified (NOTE: ff1 must also be NULL for this to work).
+#' @return A list containing output of one or more multivariate linear models
+#'   that can be inspected on their own or interacted with using [mm_VizModel]
+#'   or [mm_CompModel].
 #'
-#'@export
+#' @export
 
 
 mm_BuildModel <- function(shape_data, ..., subgrps= NULL, ff1 = NULL, univ_series=FALSE){
@@ -1040,9 +1090,12 @@ mm_BuildModel <- function(shape_data, ..., subgrps= NULL, ff1 = NULL, univ_serie
 #'
 #' Visualize 2D scatterplot of mvlm including predicted shapes.
 #'
-#' @param dat Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)
-#' @param clas_col A classifier to color the data by. If null (default) all points will be grey. Otherwise, data will be plotted as rainbow(n) colors.
-#'
+#' @param dat Input mvlm, created by [mm_BuildModel] (or by using
+#'   [geomorph::procD.lm])
+#' @param clas_col A classifier to color the data by. If null (default) all
+#'   points will be grey. Otherwise, data will be plotted as rainbow(n) colors.
+#' @return A list containing the results of the mvlm, visualizations of shape
+#'   trends along the regression line, and the model itself.
 #' @export
 
 
@@ -1150,12 +1203,16 @@ mm_VizModel <- function(dat, clas_col = NULL){
 #'
 #' Compare key figs (Rsq, p-value, etc) across multiple complex models.
 #'
-#' @param mv_results Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)
-#' @param row_labels A character vector to use in output. If NULL (default) labels from the input data will be used.
-#' @param var_labels A character vector to use in output. If NULL (default) labels from the input data will be used.
+#' @param mv_results Input mvlm, created by [mm_BuildModel] (or by using
+#'   [geomorph::procD.lm])
+#' @param row_labels A character vector to use in output. If NULL (default)
+#'   labels from the input data will be used.
+#' @param var_labels A character vector to use in output. If NULL (default)
+#'   labels from the input data will be used.
 #'
-#' @param digits Number of decimal places to round to. Default includes 4 decimal places.
-#'
+#' @param digits Number of decimal places to round to. Default includes 4
+#'   decimal places.
+#' @return description
 #' @export
 
 
@@ -1236,7 +1293,8 @@ mm_CompModel_Full <- function(mv_results, row_labels = NULL, var_labels = NULL, 
 #' @param mv_results Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)
 #' @param row_labels A character vector to use in output. If NULL (default) labels from the input data will be used.
 #' @param digits Number of decimal places to round to. Default includes 4 decimal places.
-#'
+#' @return A list containing the results of the mvlm, visualizations of shape
+#'   trends along the regression line, and the model itself.
 #' @export
 
 

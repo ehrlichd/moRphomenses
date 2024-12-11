@@ -9,17 +9,30 @@ mm_BuildModel(shape_data, ..., subgrps = NULL, ff1 = NULL, univ_series = FALSE)
 \arguments{
 \item{shape_data}{This will be the (multivariate) response variable}
 
-\item{...}{Covariate(s)/classifier(s) to build a model set. Indvidual models are run (with interaction).}
+\item{...}{Covariate(s)/classifier(s) to build a model set. Individual models
+are run with interaction effects.}
 
-\item{subgrps}{Optional. Vector of group membership. Model sets will be run across the whole sample and subgroups. If k is specified, only the full model will be run.}
+\item{subgrps}{Optional. Vector of group membership. Model sets will be run
+across the whole sample and subgroups. If k is specified, only the full
+model will be run.}
 
-\item{ff1}{An explicit model to test in the format: " coords ~ ...". Names must match those specifed in \code{...}. Standard lm notation applies.}
+\item{ff1}{An explicit model to test in the format: " coords ~ ...". Names
+must match those specifed in \code{...}. Standard lm notation applies.}
 
-\item{univ_series}{Default (FALSE) will evaluate multiple covariates and their interaction in a single model. However, it can be helpful to understand the univariate effects in isolation of interation/confounding factors. Set univ_series to TRUE to produce a series of model sets, one for each covariate specified (NOTE: ff1 must also be NULL for this to work).}
+\item{univ_series}{Default (FALSE) will evaluate multiple covariates and their
+interaction in a single model. However, it can be helpful to understand the
+univariate effects in isolation of interaction/confounding factors. Set
+\code{univ_series=TRUE} to produce a series of model sets, one for each covariate
+specified (NOTE: ff1 must also be NULL for this to work).}
+}
+\value{
+A list containing output of one or more multivariate linear models
+that can be inspected on their own or interacted with using \link{mm_VizModel}
+or \link{mm_CompModel}.
 }
 \description{
-Easily evaluate simple model sets (one covariate with up to 2 additional classifiers/covariates). Helpful for exploratory analysis.
-}
-\details{
-For detailed model or specific combinations of variables, see geomorph::procDlm for full use of this function.
+Easily evaluate simple model sets (one covariate with up to 2 additional
+classifiers/covariates). Helpful for exploratory analysis. For detailed
+models or specific combinations of variables, see \link[geomorph:procD.lm]{geomorph::procD.lm}
+for full use of this function.
 }

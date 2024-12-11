@@ -7,9 +7,15 @@
 mm_VizModel(dat, clas_col = NULL)
 }
 \arguments{
-\item{dat}{Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)}
+\item{dat}{Input mvlm, created by \link{mm_BuildModel} (or by using
+\link[geomorph:procD.lm]{geomorph::procD.lm})}
 
-\item{clas_col}{A classifier to color the data by. If null (default) all points will be grey. Otherwise, data will be plotted as rainbow(n) colors.}
+\item{clas_col}{A classifier to color the data by. If null (default) all
+points will be grey. Otherwise, data will be plotted as rainbow(n) colors.}
+}
+\value{
+A list containing the results of the mvlm, visualizations of shape
+trends along the regression line, and the model itself.
 }
 \description{
 Visualize 2D scatterplot of mvlm including predicted shapes.

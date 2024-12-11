@@ -11,11 +11,31 @@ mm_Phenotype(dat, kgrps, cuttree_h = NULL, cuttree_k = NULL, plot_figs = TRUE)
 
 \item{kgrps}{A non-negative integer of sub-groups to draw. kgrps=1 will provide results for the whole input dat.}
 
-\item{cuttree_h}{Optional. Draw clusters by splitting the tree at a given height, h.}
+\item{cuttree_h}{Optional. Draw clusters by splitting the tree at a given
+height, h.}
 
 \item{cuttree_k}{Optional. Draw clsuters by splitting the tree into number of branches, k}
 
 \item{plot_figs}{Optional. Default = TRUE, plot phenotypes for each set(s) of subgroups.}
+}
+\value{
+If plot_figs=TRUE (Default), plot associated graphs and return a list containing:
+\itemize{
+\item  ALN - an array containing aligned and scaled landmark data, the
+output of \code{\link{mm_ArrayData}}
+\item PCA - PC scores, eigenvalues, and shape visualizations, the output of
+\code{\link{mm_CalcShapespace}}
+\itemize TREE - Dendrogram of PC scores, the output of
+\code\link{mm_Diagnostics}}
+\item k_grps - If \code{kgrps} is specified, a vector defining group membership
+(as integer); the results of k-means clustering based on PC scores.
+\item cth_grps - If \code{cth_grps} is specified, a vector defining group
+membership (as integer); the results of clustering using
+\link[dendextend:cutree-methods]{dendextend::cutree} for a given height.
+\item ctk_grps - If \code{ctk_grps} is specified, a vector defining group
+membership (as integer); the results of clustering using
+\link[dendextend:cutree-methods]{dendextend::cutree} for a given number of clusters.
+}
 }
 \description{
 Partition sample into clusters, based on information from

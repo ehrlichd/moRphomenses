@@ -15,9 +15,11 @@ mm_VizShapespace(
 )
 }
 \arguments{
-\item{mmPCA}{Output of \code{mm_CalcShapespace}, containing a PCA object with PC shapes}
+\item{mmPCA}{Output of \code{mm_CalcShapespace}, containing a PCA object with
+PC shapes}
 
-\item{xPC}{The PC to be plotted on the x axis. If yPC is left null, a univariate density distribution will be plotted with min/max shapes.}
+\item{xPC}{The PC to be plotted on the x axis. If yPC is left null, a
+univariate density distribution will be plotted with min/max shapes.}
 
 \item{yPC}{The PC to be plotted on the y axis.}
 
@@ -27,7 +29,13 @@ mm_VizShapespace(
 
 \item{title}{To be used for the plot}
 
-\item{png_dir}{A file path to a directory in which to save out PNG figures. Names will be automatically assigned based on input PC(s).}
+\item{png_dir}{A file path to a directory in which to save out PNG figures.
+Names will be automatically assigned based on input PC(s).}
+}
+\value{
+Produces a series of plots to visualize PCA analysis. If \code{png_dir} is
+specified, function will save out \code{.png} files. Otherwise plots will be
+displayed in the default plot window.
 }
 \description{
 Plot a scatterplot and vizualize shape change across the X axis.

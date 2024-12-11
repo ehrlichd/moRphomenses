@@ -11,6 +11,10 @@ print_summary(aln, grps = NULL)
 
 \item{grps}{(Optional) A numeric vector that defines groupings}
 }
+\value{
+A character vector with basic descriptive information, to be used with
+\code{\link[=print]{print()}}. If \code{grps=TRUE}, will return a list of character vectors.
+}
 \description{
 Print basic summary
 }

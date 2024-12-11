@@ -2,7 +2,7 @@
 % Please edit documentation in R/helper_functions.R
 \name{mm_ellipse}
 \alias{mm_ellipse}
-\title{Add confidence ellipses to a scatterplot.}
+\title{Add confidence ellipses to an active scatterplot.}
 \usage{
 mm_ellipse(
   dat,
@@ -21,8 +21,12 @@ mm_ellipse(
 
 \item{fillCol}{Fill color of the shape.}
 
-\item{smoothness}{Lower values will look jagged, higher value will make smoother lines, but may take a long time to plot. Default value is 20.}
+\item{smoothness}{Lower values will look jagged, higher value will make
+smoother lines, but may take a long time to plot. Default value is 20.}
+}
+\value{
+No value. Will add an ellipses of a given size to the current plot.
 }
 \description{
-Add confidence ellipses to a scatterplot.
+Add confidence ellipses to an active scatterplot.
 }

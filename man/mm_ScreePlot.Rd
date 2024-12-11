@@ -13,6 +13,9 @@ mm_ScreePlot(x, maxC = 15, ...)
 
 \item{...}{Additional arguments to be passed to plot}
 }
+\value{
+No value, produces diagnostic plot.
+}
 \description{
 Plot total within group sum of squares to evalaute clusters
 }

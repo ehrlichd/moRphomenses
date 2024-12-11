@@ -17,6 +17,9 @@ mm_pretty_pca(PCA, xPC = 1, yPC = 2, clas_col = NULL, legend_cex = 0.8)
 
 \item{legend_cex}{A scaling factor to be applied specifically to the legend. Set to NULL for scatterplot only.}
 }
+\value{
+Returns no object, plots results of PCA
+}
 \description{
 Pretty PCA
 }

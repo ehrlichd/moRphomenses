@@ -11,6 +11,9 @@ mm_CalcShapespace(dat, max_Shapes = 10)
 
 \item{max_Shapes}{The maximum amount of PCs to visualize. Default 10.}
 }
+\value{
+A list containing the results of shape-pca, including vizualizations of shape extrema for each Principal Component.
+}
 \description{
 Conduct PCA of shape data and visualize major shape trends.
 }

@@ -11,6 +11,9 @@ mm_ColorLeaves(dendro, cols)
 
 \item{cols}{a vector of colors}
 }
+\value{
+A dendrogram class object with leaves colored as specified.
+}
 \description{
 Specify color order approriately for a dendrogram
 }

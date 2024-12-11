@@ -7,13 +7,20 @@
 mm_CompModel_Full(mv_results, row_labels = NULL, var_labels = NULL, digits = 4)
 }
 \arguments{
-\item{mv_results}{Input mvlm, created by mm_BuildModel (or by using geomorph::procD.lm)}
+\item{mv_results}{Input mvlm, created by \link{mm_BuildModel} (or by using
+\link[geomorph:procD.lm]{geomorph::procD.lm})}
 
-\item{row_labels}{A character vector to use in output. If NULL (default) labels from the input data will be used.}
+\item{row_labels}{A character vector to use in output. If NULL (default)
+labels from the input data will be used.}
 
-\item{var_labels}{A character vector to use in output. If NULL (default) labels from the input data will be used.}
+\item{var_labels}{A character vector to use in output. If NULL (default)
+labels from the input data will be used.}
 
-\item{digits}{Number of decimal places to round to. Default includes 4 decimal places.}
+\item{digits}{Number of decimal places to round to. Default includes 4
+decimal places.}
+}
+\value{
+description
 }
 \description{
 Compare key figs (Rsq, p-value, etc) across multiple complex models.

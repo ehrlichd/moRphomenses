@@ -9,11 +9,18 @@ mm_mute_cols(cols, s = NULL, v = NULL, alpha = 0.4)
 \arguments{
 \item{cols}{a vector of colors, eg: "#0066FF"}
 
-\item{s}{Either a single value or a vector of same length as cols specifying a new saturation (range 0-1). colors darken to black (0)}
+\item{s}{Either a single value or a vector of same length as cols specifying
+a new saturation (range 0-1). colors darken to black (0).}
 
-\item{v}{Either a single value or a vector of same length as cols specifying a new value (range 0-1). colors lighten to white (0)}
+\item{v}{Either a single value or a vector of same length as cols specifying
+a new value (range 0-1). colors lighten to white (0)}
 
-\item{alpha}{Either a single value or a vector of same length as cols specifying a transparency value (range 0-1). colors translucent at 0.}
+\item{alpha}{Either a single value or a vector of same length as cols
+specifying a transparency value (range 0-1). colors translucent at 0.}
+}
+\value{
+A vector of colors that have been modified in saturation, value, or
+alpha
 }
 \description{
 Modify color/transparency using hsv syntax

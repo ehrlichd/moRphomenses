@@ -9,6 +9,9 @@ mm_transf_geom(x)
 \arguments{
 \item{x}{A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.}
 }
+\value{
+Returns a scaled vector
+}
 \description{
 Calculate the geometric mean of a vector and scale all values by it.
 }

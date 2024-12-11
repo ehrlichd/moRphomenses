@@ -31,7 +31,7 @@ mm_FlattenArray <- function(A, sep = "."){
 #' @param x Input data for cluster analysis (IE, PCA)
 #' @param maxC Maximum clusters to evaluate
 #' @param ... Additional arguments to be passed to plot
-#'
+#' @return No value, produces diagnostic plot.
 #' @export
 #'
 
@@ -55,7 +55,7 @@ mm_ScreePlot <- function(x, maxC = 15, ...) {
 #' @param x Input data for cluster analysis (IE PCA)
 #' @param maxC Maximum clusters to evaluate
 #' @param ... additional arguments passed to plot
-#'
+#' @return No value, produces diagnostic plot.
 #' @export
 #'
 mm_SilPlot <- function(x, maxC=15, ...) {
@@ -84,7 +84,9 @@ mm_SilPlot <- function(x, maxC=15, ...) {
 #'
 #' @param dat a 2d matrix of data. Presumably PC scores
 #' @param grps a vector defining group IDs
-#' @param plots Logical. Should distances be plotted as vusing boxplots? If FALSE, distance calculations are still performed
+#' @param plots Logical. Should distances be plotted as boxplots? If FALSE, distance calculations are still performed
+#' @return A list containing individual distances from the sample mean shape. If
+#'   `plots=TRUE`, will also visualize results
 #' @export
 #'
 
@@ -151,6 +153,7 @@ mm_grp_dists <- function(dat, grps, plots  = TRUE){
 #'
 #' @param dendro A dendrogram or hclust class object
 #' @param cols a vector of colors
+#' @return A dendrogram class object with leaves colored as specified.
 #' @export
 
 mm_ColorLeaves <- function(dendro, cols){
@@ -170,9 +173,14 @@ mm_ColorLeaves <- function(dendro, cols){
 #' Modify color/transparency using hsv syntax
 #'
 #' @param cols a vector of colors, eg: "#0066FF"
-#' @param s Either a single value or a vector of same length as cols specifying a new saturation (range 0-1). colors darken to black (0)
-#' @param v Either a single value or a vector of same length as cols specifying a new value (range 0-1). colors lighten to white (0)
-#' @param alpha Either a single value or a vector of same length as cols specifying a transparency value (range 0-1). colors translucent at 0.
+#' @param s Either a single value or a vector of same length as cols specifying
+#'   a new saturation (range 0-1). colors darken to black (0).
+#' @param v Either a single value or a vector of same length as cols specifying
+#'   a new value (range 0-1). colors lighten to white (0)
+#' @param alpha Either a single value or a vector of same length as cols
+#'   specifying a transparency value (range 0-1). colors translucent at 0.
+#' @return A vector of colors that have been modified in saturation, value, or
+#'   alpha
 #' @export
 
 mm_mute_cols <- function(cols, s=NULL,v=NULL,alpha=.4){
@@ -194,14 +202,16 @@ mm_mute_cols <- function(cols, s=NULL,v=NULL,alpha=.4){
 }
 
 
-#'  Add confidence ellipses to a scatterplot.
+#'  Add confidence ellipses to an active scatterplot.
 #'
 #'
 #' @param dat A matrix of data to draw an ellipses around.
 #' @param ci Percentage of data to capture. Must be one of c(67.5, 90, 95, 99).
 #' @param linesCol Border color of the shape.
 #' @param fillCol Fill color of the shape.
-#' @param smoothness Lower values will look jagged, higher value will make smoother lines, but may take a long time to plot. Default value is 20.
+#' @param smoothness Lower values will look jagged, higher value will make
+#'   smoother lines, but may take a long time to plot. Default value is 20.
+#' @return No value. Will add an ellipses of a given size to the current plot.
 #' @export
 
 mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
@@ -262,7 +272,10 @@ mm_ellipse <- function (dat, ci = c(67.5, 90, 95, 99), linesCol = "black",
 #' @param A A landmark array used for the pca
 #' @param PCA output of prcomp. Should contain $transormation
 #' @param target_coords A single set of X,Y coordinates.
-#' @param target_PCs Integer identifying which pc to use on the X and Y axis. Default is c(1,2) for PC1 on x and PC2 on y
+#' @param target_PCs Integer identifying which pc to use on the X and Y axis.
+#'   Default is c(1,2) for PC1 on x and PC2 on y
+#' @return A landmark array representing the hypothetical shape of a given set
+#'   of coordinates.
 #' @export
 #'
 
@@ -293,6 +306,8 @@ mm_coords_to_shape <- function (A, PCA, target_coords, target_PCs = c(1,2)){
 #'
 #' @param aln An object created with mm_ArrayData
 #' @param grps (Optional) A numeric vector that defines groupings
+#' @return A character vector with basic descriptive information, to be used with
+#'   [print()]. If `grps=TRUE`, will return a list of character vectors.
 #' @export
 #'
 

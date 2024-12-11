@@ -9,6 +9,9 @@ mm_transf_log(x)
 \arguments{
 \item{x}{A numeric vector to be scaled. Missing values will produce NA, conduct knn imputation using mm_FillMissing first.}
 }
+\value{
+Returns a scaled vector
+}
 \description{
 Transform a vector by the natural log.
 }

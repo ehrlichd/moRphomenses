@@ -7,9 +7,12 @@
 mm_get_interval(days, day0 = NULL)
 }
 \arguments{
-\item{days}{The number of days(divisions) fit between -1 and 1 (inclusive)}
+\item{days}{The length of the sequence to return, inclusive of the endpoints (-1,1)}
 
-\item{day0}{If NULL (default), the median integer will be calculated. This produces symmetrical ranges when days = odd number. Can be specified for asymmetric ranges.}
+\item{day0}{If NULL (default), the median integer will be calculated, centering the range on 0. Specifying a value will set 0 to that value, creating asymmetric ranges.}
+}
+\value{
+Returns a numeric vector of specified length, ranging from -1 to 1
 }
 \description{
 Create a sequence from -1:1 of specified length. MIDpoint (day0) can be

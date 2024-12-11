@@ -6,6 +6,9 @@
 \usage{
 mm_Explorer()
 }
+\value{
+No value. Will launch \code{shiny} app in default web browser.
+}
 \description{
 Launch mm_Explorer
 }

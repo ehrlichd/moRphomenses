@@ -11,7 +11,11 @@ mm_grp_dists(dat, grps, plots = TRUE)
 
 \item{grps}{a vector defining group IDs}
 
-\item{plots}{Logical. Should distances be plotted as vusing boxplots? If FALSE, distance calculations are still performed}
+\item{plots}{Logical. Should distances be plotted as boxplots? If FALSE, distance calculations are still performed}
+}
+\value{
+A list containing individual distances from the sample mean shape. If
+\code{plots=TRUE}, will also visualize results
 }
 \description{
 Calculate and plot group distance from centroid (grand mean)

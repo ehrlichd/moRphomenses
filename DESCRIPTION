@@ -1,6 +1,6 @@
 Package: moRphomenses
 Title: Geometric Morphometric Tools to Align, Scale, and Compare "Shape" of Menstrual Cycle Hormones
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: person(given = "Daniel", family = "Ehrlich", email = "dan.ehrlich.e@gmail.com", role = c("aut", "cre"))
 Description: Mitteroecker & Gunz (2009) <doi:10.1007/s11692-009-9055-x> describe
     how geometric morphometric methods allow researchers to quantify the size
